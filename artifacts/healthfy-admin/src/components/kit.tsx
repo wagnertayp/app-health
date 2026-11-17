@@ -17,8 +17,6 @@ import { errMsg } from "@/lib/format";
 
 export function PageHeader({
   title,
-  subtitle,
-  eyebrow,
   actions,
   back,
 }: {
@@ -36,9 +34,7 @@ export function PageHeader({
             <ArrowLeft className="h-3.5 w-3.5" /> {back.label}
           </Link>
         )}
-        {eyebrow && <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[hsl(var(--chart-1))]">{eyebrow}</div>}
         <h1 className="text-2xl font-semibold text-foreground sm:text-[26px]">{title}</h1>
-        {subtitle && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -47,7 +43,6 @@ export function PageHeader({
 
 export function Panel({
   title,
-  description,
   actions,
   children,
   className,
@@ -66,7 +61,6 @@ export function Panel({
         <header className="flex items-center justify-between gap-3 border-b px-4 py-3">
           <div className="min-w-0">
             <h2 className="text-sm font-semibold">{title}</h2>
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </header>
@@ -96,7 +90,7 @@ export function Stat({
         {Icon && <Icon className="h-3.5 w-3.5" />}
       </div>
       <div className="num mt-1.5 text-xl font-semibold text-foreground">{value}</div>
-      {hint && <div className="mt-0.5 text-[11px] text-muted-foreground">{hint}</div>}
+      {hint && <div className="font-description mt-0.5 text-[11px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }
@@ -202,7 +196,7 @@ export function Field({ label, hint, children, className }: { label: string; hin
     <label className={cn("block", className)}>
       <span className="mb-1 block text-xs font-medium text-foreground/80">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-[11px] text-muted-foreground">{hint}</span>}
+      {hint && <span className="font-description mt-1 block text-[11px] text-muted-foreground">{hint}</span>}
     </label>
   );
 }
@@ -254,7 +248,7 @@ export function Notice({ tone = "amber", icon: Icon, title, children }: { tone?:
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div>
         <div className="font-semibold">{title}</div>
-        {children && <div className="mt-0.5 text-xs opacity-90">{children}</div>}
+        {children && <div className="font-description mt-0.5 text-xs opacity-90">{children}</div>}
       </div>
     </div>
   );

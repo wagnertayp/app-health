@@ -31,11 +31,9 @@ export default function FinanceHome() {
     <div className="space-y-6">
       <section className="fade-up flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[hsl(var(--chart-1))]">Financeiro · Central de faturas</div>
-          <h1 className="max-w-2xl text-3xl font-semibold leading-[1.05] sm:text-[40px]">
-            Venda horas. Emita invoices <span className="text-muted-foreground">com acabamento de agência.</span>
+          <h1 className="text-2xl font-semibold text-foreground sm:text-[26px]">
+            Central de faturas
           </h1>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground">Pacotes, documentos numerados e links de checkout em um só lugar. Status de pagamento é registrado manualmente.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild data-testid="button-new-product">

@@ -1,0 +1,98 @@
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Thin_1794885025955.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-ThinItalic_1794885025955.otf') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Light_1794885025952.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-LightItalic_1794885025952.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Regular_1794885025954.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Italic_1794885025952.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Medium_1794885025953.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-MediumItalic_1794885025954.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Bold_1794885025948.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-BoldItalic_1794885025949.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-ExtraBold_1794885025949.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-ExtraBoldItalic_1794885025951.otf') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-Black_1794885025947.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Stage Grotesk';
+  src: url('../../../attached_assets/StageGrotesk-BlackItalic_1794885025948.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}

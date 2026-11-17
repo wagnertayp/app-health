@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500;600&display=swap');
+@import './fonts.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -114,9 +114,10 @@
   --chart-4: 38 88% 52%;
   --chart-5: 262 30% 52%;
 
-  --app-font-sans: 'Geist', 'DM Sans', sans-serif;
+  --app-font-sans: 'Stage Grotesk', Arial, sans-serif;
   --app-font-serif: Georgia, serif;
-  --app-font-mono: 'Geist Mono', ui-monospace, monospace;
+  --app-font-mono: 'Stage Grotesk', Arial, sans-serif;
+  --app-font-description: Arial, sans-serif;
   --radius: 0.625rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(222 30% 20% / 0.04); /*replace with H S L */
   --shadow-xs: 0px 2px 0px 0px hsl(222 30% 20% / 0.04); /*replace with H S L */
@@ -383,6 +384,9 @@
   h1,h2,h3 { letter-spacing: -0.025em; }
 }
 .num { font-family: var(--app-font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+p, .font-description, [data-slot="form-description"], [data-slot="dialog-description"], [data-slot="alert-dialog-description"] {
+  font-family: var(--app-font-description);
+}
 .card-surface { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 12px; box-shadow: 0 1px 0 hsl(222 30% 20% / 0.04), 0 1px 2px hsl(222 30% 20% / 0.04); }
 .fade-up { animation: fadeUp .38s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

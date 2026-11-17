@@ -46,6 +46,7 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 ## User preferences
 
 - Follow the supplied Healthfy brief: dark collapsible sidebar, predominantly white content, restrained Shopify-inspired professional presentation.
+- Use the supplied Stage Grotesk family for interface typography and Arial for descriptions. Avoid subtitles; keep necessary form guidance and operational warnings.
 - Keep Projetos nested inside Clientes, never a standalone top-level sidebar module.
 - Do not present fictitious operational data as real or include decorative nonfunctional actions.
 
