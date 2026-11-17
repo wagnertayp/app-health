@@ -63,10 +63,6 @@ export function isOverdue(inv: { status: string; dueDate: string }) {
   return inv.status === "pending" && inv.dueDate < localISO();
 }
 
-export function checkoutUrl(id: string) {
-  return `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, "")}/checkout/${id}`;
-}
-
 export function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
 }

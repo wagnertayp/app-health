@@ -23,20 +23,20 @@ import Horas from '@/pages/horas';
 import Agenda from '@/pages/agenda';
 import Agentes from '@/pages/agentes';
 import Trackeamento from '@/pages/trackeamento';
-import Checkout from '@/pages/checkout';
 import Configuracoes from '@/pages/configuracoes';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false, retry: 1 } } });
 
 function Router() {
   const [loc] = useLocation();
-  if (loc.startsWith('/checkout/')) {
+  if (loc === '/checkout' || loc.startsWith('/checkout/')) {
     return (
-      <RoutedErrorBoundary>
-        <Switch>
-          <Route path="/checkout/:id" component={Checkout} />
-        </Switch>
-      </RoutedErrorBoundary>
+      <main className="flex min-h-screen items-center justify-center bg-background px-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">Página indisponível</h1>
+          <p className="font-description mt-3 text-sm text-muted-foreground">Este endereço não está mais disponível.</p>
+        </div>
+      </main>
     );
   }
   return (

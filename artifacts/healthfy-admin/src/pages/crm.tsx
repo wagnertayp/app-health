@@ -36,7 +36,7 @@ export default function Crm() {
     { name: "email", label: "E-mail", type: "text", meta: true },
     { name: "phone", label: "Telefone", type: "text", meta: true },
     { name: "status", label: "Etapa", type: "select", options: all.map((s) => ({ value: s, label: s })) },
-    { name: "source", label: "Origem", type: "text", meta: true, placeholder: "Indicação, Instagram, Checkout..." },
+    { name: "source", label: "Origem", type: "text", meta: true, placeholder: "Indicação, Instagram, Site..." },
     { name: "responsible", label: "Responsável", type: "text" },
     { name: "value", label: "Valor potencial (R$)", type: "number" },
     { name: "priority", label: "Prioridade", type: "priority" },
@@ -100,7 +100,7 @@ export default function Crm() {
           </div>
         </div>
       ) : list.length === 0 ? (
-        <EmptyState icon={Users2} title="Nenhum lead" body="Leads também chegam automaticamente pelas solicitações de checkout." action={<Button size="sm" onClick={() => setOpen(true)}>Novo lead</Button>} />
+        <EmptyState icon={Users2} title="Nenhum lead" body="Cadastre oportunidades para acompanhar seus contatos comerciais." action={<Button size="sm" onClick={() => setOpen(true)}>Novo lead</Button>} />
       ) : (
         <Panel bodyClassName="p-4">
           <TableWrap>

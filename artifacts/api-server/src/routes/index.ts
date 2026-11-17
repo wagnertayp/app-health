@@ -3,7 +3,6 @@ import healthRouter from "./health";
 import catalogRouter from "./catalog";
 import invoiceRouter from "./invoices";
 import recordsRouter from "./records";
-import checkoutRouter from "./checkout";
 import overviewRouter from "./overview";
 import authRouter from "./auth";
 import storageRouter from "./storage";
@@ -12,7 +11,9 @@ import { requireAdmin } from "../middlewares/authMiddleware";
 const router: IRouter = Router();
 
 router.use(healthRouter);
-router.use(checkoutRouter);
+router.all(/^\/checkout(?:\/.*)?$/, (_req, res) => {
+  res.status(410).json({ error: "Este endereço de compra não está mais disponível." });
+});
 router.use(authRouter);
 router.use(storageRouter);
 router.use(requireAdmin);

@@ -49,7 +49,7 @@ const NAV: Item[] = [
       { label: "Central de faturas", href: "/", icon: ReceiptText, match: (p) => p === "/" },
       { label: "Visão geral", href: "/financeiro", icon: LineChart },
       { label: "Invoices", href: "/invoices", icon: FileText, match: (p) => p.startsWith("/invoices") },
-      { label: "Produtos e checkout", href: "/produtos", icon: Package, match: (p) => p.startsWith("/produtos") },
+      { label: "Produtos", href: "/produtos", icon: Package, match: (p) => p.startsWith("/produtos") },
       { label: "Horas", href: "/horas", icon: Timer },
     ],
   },

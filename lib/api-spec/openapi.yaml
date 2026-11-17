@@ -267,30 +267,6 @@ paths:
       operationId: deleteRecord
       responses:
         "204": { description: Deleted }
-  /checkout/{id}:
-    parameters:
-      - { name: id, in: path, required: true, schema: { type: string } }
-    get:
-      operationId: getCheckout
-      responses:
-        "200":
-          description: Public active product and payment connection state
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Checkout" }
-    post:
-      operationId: submitCheckout
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/CheckoutInput" }
-      responses:
-        "201":
-          description: Purchase request registered, not payment confirmation
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/PurchaseRequest" }
   /activity:
     get:
       operationId: listActivity
@@ -498,28 +474,3 @@ components:
         date: { type: string }
         revenue: { type: number }
         expenses: { type: number }
-    Checkout:
-      type: object
-      required: [product, paymentConnected, sellerName, message]
-      properties:
-        product: { $ref: "#/components/schemas/Product" }
-        paymentConnected: { type: boolean }
-        sellerName: { type: string }
-        message: { type: string }
-    CheckoutInput:
-      type: object
-      required: [name, email, document, quantity, acceptedTerms]
-      properties:
-        name: { type: string, minLength: 2, maxLength: 200 }
-        email: { type: string, format: email, maxLength: 250 }
-        document: { type: string, maxLength: 60 }
-        quantity: { type: integer, minimum: 1, maximum: 100 }
-        acceptedTerms: { type: boolean, enum: [true] }
-    PurchaseRequest:
-      type: object
-      required: [id, status, message, total]
-      properties:
-        id: { type: string }
-        status: { type: string, enum: [awaiting_contact] }
-        message: { type: string }
-        total: { type: number }

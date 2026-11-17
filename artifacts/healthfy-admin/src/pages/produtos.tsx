@@ -1,23 +1,17 @@
 import { Link } from "wouter";
-import { Copy, ExternalLink, Package, Pencil, Plus } from "lucide-react";
+import { Package, Pencil, Plus } from "lucide-react";
 import { useListProducts } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { EmptyState, ErrorState, LoadingRows, PageHeader, Pill } from "@/components/kit";
-import { brl, checkoutUrl, num, usePageMeta } from "@/lib/format";
+import { brl, num, usePageMeta } from "@/lib/format";
 import { productTypeLabel } from "@/lib/status";
 
 export default function Produtos() {
-  usePageMeta("Produtos e checkout", "Catálogo de pacotes de horas e serviços da Healthfy.");
+  usePageMeta("Produtos", "Catálogo de pacotes de horas e serviços da Healthfy.");
   const products = useListProducts();
-  const { toast } = useToast();
-  const copy = async (id: string) => {
-    try { await navigator.clipboard.writeText(checkoutUrl(id)); toast({ title: "Link copiado" }); }
-    catch { toast({ title: "Copie manualmente", description: checkoutUrl(id) }); }
-  };
   return (
     <div>
-      <PageHeader eyebrow="Financeiro" title="Produtos e checkout" subtitle="Pacotes de horas, serviços e páginas de checkout personalizadas." actions={<Button asChild data-testid="button-new-product"><Link href="/produtos/novo"><Plus className="mr-1.5 h-4 w-4" />Novo produto</Link></Button>} />
+      <PageHeader title="Produtos" actions={<Button asChild data-testid="button-new-product"><Link href="/produtos/novo"><Plus className="mr-1.5 h-4 w-4" />Novo produto</Link></Button>} />
       {products.isLoading ? <LoadingRows /> : products.isError ? <ErrorState error={products.error} onRetry={() => products.refetch()} /> : !products.data?.length ? (
         <EmptyState icon={Package} title="Catálogo vazio" body="Crie um pacote de horas para vender e faturar." action={<Button size="sm" asChild><Link href="/produtos/novo">Criar produto</Link></Button>} />
       ) : (
@@ -37,8 +31,6 @@ export default function Produtos() {
                 </div>
                 <div className="mt-4 flex gap-1.5">
                   <Button size="sm" variant="outline" className="flex-1" asChild data-testid={`button-edit-${p.id}`}><Link href={`/produtos/${p.id}`}><Pencil className="mr-1 h-3.5 w-3.5" />Editar</Link></Button>
-                  <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => copy(p.id)} title="Copiar link" data-testid={`button-copy-${p.id}`}><Copy className="h-3.5 w-3.5" /></Button>
-                  <Button size="icon" variant="outline" className="h-8 w-8" asChild title="Abrir checkout"><a href={checkoutUrl(p.id)} target="_blank" rel="noreferrer" data-testid={`link-checkout-${p.id}`}><ExternalLink className="h-3.5 w-3.5" /></a></Button>
                 </div>
               </div>
             </article>

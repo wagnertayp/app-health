@@ -1,31 +1,20 @@
 import { Link } from "wouter";
-import { ArrowUpRight, Copy, ExternalLink, FilePlus2, FileText, Package, PlugZap, Receipt, Timer, Wallet, AlertCircle } from "lucide-react";
+import { ArrowUpRight, FilePlus2, FileText, Package, PlugZap, Receipt, Timer, Wallet, AlertCircle } from "lucide-react";
 import { useGetOverview, getGetOverviewQueryKey, useListInvoices, useListProducts } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { EmptyState, ErrorState, LoadingRows, Notice, Panel, Pill, Stat, TableWrap, Td, Th } from "@/components/kit";
-import { brl, checkoutUrl, fmtDate, num, usePageMeta } from "@/lib/format";
+import { brl, fmtDate, num, usePageMeta } from "@/lib/format";
 import { invoiceKey, invoiceStatusLabel, invoiceStatusTone, productTypeLabel } from "@/lib/status";
 
 export default function FinanceHome() {
-  usePageMeta("Central de faturas", "Venda de horas, emissão de invoices e checkouts da Healthfy IA.");
+  usePageMeta("Central de faturas", "Venda de horas e emissão de invoices da Healthfy IA.");
   const overview = useGetOverview({ days: 30 }, { query: { queryKey: getGetOverviewQueryKey({ days: 30 }) } });
   const invoices = useListInvoices();
   const products = useListProducts();
-  const { toast } = useToast();
   const o = overview.data;
   const ref = (products.data ?? []).find((p) => p.active && p.type === "hours") ?? (products.data ?? []).find((p) => p.active);
   const recent = [...(invoices.data ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
   const counts = o?.invoiceCounts;
-
-  const copy = async (id: string) => {
-    try {
-      await navigator.clipboard.writeText(checkoutUrl(id));
-      toast({ title: "Link do checkout copiado" });
-    } catch {
-      toast({ title: "Não foi possível copiar", description: checkoutUrl(id), variant: "destructive" });
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -46,7 +35,7 @@ export default function FinanceHome() {
       </section>
 
       <Notice tone="blue" icon={PlugZap} title="Pagamentos não conectados">
-        Nenhum gateway está integrado. Invoices e checkouts registram solicitações; a confirmação de pagamento é feita manualmente por você.
+        Nenhum gateway está integrado. A confirmação de pagamento das invoices é feita manualmente por você.
       </Notice>
 
       {overview.isError ? (
@@ -61,7 +50,7 @@ export default function FinanceHome() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1.6fr]">
-        <Panel title="Produto de referência" description="Pacote pronto para faturar ou compartilhar" bodyClassName="p-0">
+        <Panel title="Produto de referência" bodyClassName="p-0">
           {products.isLoading ? (
             <div className="p-4"><LoadingRows rows={3} /></div>
           ) : products.isError ? (
@@ -83,12 +72,8 @@ export default function FinanceHome() {
                     {ref.type === "hours" && ref.hours > 0 && <div className="text-xs text-muted-foreground">{num(ref.hours)} horas · {brl(ref.price / ref.hours)}/h</div>}
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <div className="mt-4 grid grid-cols-1 gap-2">
                   <Button size="sm" asChild data-testid="button-invoice-reference"><Link href={`/invoices/nova?product=${ref.id}`}>Faturar</Link></Button>
-                  <Button size="sm" variant="outline" onClick={() => copy(ref.id)} data-testid="button-copy-checkout"><Copy className="mr-1.5 h-3.5 w-3.5" />Copiar link</Button>
-                  <Button size="sm" variant="outline" asChild data-testid="button-open-checkout">
-                    <a href={checkoutUrl(ref.id)} target="_blank" rel="noreferrer"><ExternalLink className="mr-1.5 h-3.5 w-3.5" />Checkout</a>
-                  </Button>
                 </div>
               </div>
             </div>

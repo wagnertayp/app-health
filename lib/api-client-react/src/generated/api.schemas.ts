@@ -324,45 +324,6 @@ export interface Overview {
   series: RevenuePoint[];
 }
 
-export interface Checkout {
-  product: Product;
-  paymentConnected: boolean;
-  sellerName: string;
-  message: string;
-}
-
-export interface CheckoutInput {
-  /**
-     * @minLength 2
-     * @maxLength 200
-     */
-  name: string;
-  /** @maxLength 250 */
-  email: string;
-  /** @maxLength 60 */
-  document: string;
-  /**
-     * @minimum 1
-     * @maximum 100
-     */
-  quantity: number;
-  acceptedTerms: true;
-}
-
-export type PurchaseRequestStatus = typeof PurchaseRequestStatus[keyof typeof PurchaseRequestStatus];
-
-
-export const PurchaseRequestStatus = {
-  awaiting_contact: 'awaiting_contact',
-} as const;
-
-export interface PurchaseRequest {
-  id: string;
-  status: PurchaseRequestStatus;
-  message: string;
-  total: number;
-}
-
 export type BeginBrowserLoginParams = {
 returnTo?: string;
 };
