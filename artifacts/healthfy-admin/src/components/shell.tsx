@@ -135,12 +135,9 @@ function SidebarBody({ collapsed, onNav, onToggle }: { collapsed: boolean; onNav
   return (
     <div className="flex h-full flex-col">
       <div className={cn("flex h-14 items-center gap-2.5 border-b border-sidebar-border", collapsed ? "justify-center px-2" : "px-4")}>
-        <img src={logo} alt="Healthfy" className="h-8 w-8 rounded-lg ring-1 ring-white/10" />
+        <img src={logo} alt="Healthfy" className="h-9 w-9 rounded-full object-cover ring-1 ring-white/15" />
         {!collapsed && (
-          <div className="leading-tight">
-            <div className="text-[13px] font-semibold text-sidebar-accent-foreground">Healthfy Admin</div>
-            <div className="text-[10px] uppercase tracking-[0.16em] text-sidebar-foreground/60">Sistemas e automação</div>
-          </div>
+          <span className="text-sm font-semibold tracking-tight text-sidebar-accent-foreground">Healthfy</span>
         )}
       </div>
       <nav className={cn("flex-1 space-y-0.5 overflow-y-auto py-3", collapsed ? "flex flex-col items-center px-2" : "px-2.5")}>
@@ -196,7 +193,10 @@ export function Shell({ children }: { children: ReactNode }) {
           <button className="rounded-md p-1.5 hover:bg-muted md:hidden" onClick={() => setMobile(true)} data-testid="button-open-menu">
             <Menu className="h-5 w-5" />
           </button>
-          <img src={logo} alt="" className="h-7 w-7 rounded-md md:hidden" />
+          <div className="flex items-center gap-2 md:hidden">
+            <img src={logo} alt="" className="h-7 w-7 rounded-full object-cover" />
+            <span className="text-sm font-semibold">Healthfy</span>
+          </div>
           <div className="flex-1" />
           {session && (
             <div className="flex items-center gap-2" data-testid="status-session">
