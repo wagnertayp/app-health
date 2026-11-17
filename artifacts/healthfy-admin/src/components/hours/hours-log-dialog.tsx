@@ -18,7 +18,7 @@ type TimerDraft = {
   elapsedMs: number;
   startedAt: number | null;
 };
-type Balance = { sold: number; used: number };
+type Balance = { sold: number; used: number; packageUsed?: number; packageLimit?: number; packageStart?: string };
 type DraftField = "title" | "customerId" | "responsible" | "description" | "date" | "hours";
 
 function emptyDraft(): TimerDraft {
@@ -81,8 +81,14 @@ export function HoursLogDialog({
   const durationMs = elapsed(draft, now);
   const countedHours = draft.startedAt ? hoursValue(durationMs) : Number(draft.hours) || 0;
   const selectedBalance = balances[draft.customerId] ?? { sold: 0, used: 0 };
-  const projectedUsed = selectedBalance.used + countedHours;
-  const progress = selectedBalance.sold > 0 ? Math.min(100, (projectedUsed / selectedBalance.sold) * 100) : 0;
+  const packageUsed = selectedBalance.packageUsed ?? selectedBalance.used;
+  const packageLimit = selectedBalance.packageLimit ?? selectedBalance.sold;
+  const hasPackageLimit = selectedBalance.packageLimit !== undefined || selectedBalance.sold > 0;
+  const hasActivePackage = !!selectedBalance.packageStart;
+  const projectedUsed = packageUsed + countedHours;
+  const progress = hasPackageLimit
+    ? packageLimit > 0 ? Math.min(100, (projectedUsed / packageLimit) * 100) : projectedUsed > 0 ? 100 : 0
+    : 0;
   const percentLabel = useMemo(() => `${Math.round(progress)}%`, [progress]);
   const hasTimer = durationMs > 0 || !!draft.startedAt;
 
@@ -215,25 +221,29 @@ export function HoursLogDialog({
 
                 <section className="rounded-xl border bg-card p-4" aria-label="Progresso do pacote do cliente">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-semibold">Progresso do pacote</div>
-                    {draft.customerId && selectedBalance.sold > 0 && <span className="num text-xs font-medium text-muted-foreground">{percentLabel}</span>}
+                    <div className="text-sm font-semibold">Progresso do pacote atual</div>
+                    {draft.customerId && hasPackageLimit && <span className="num text-xs font-medium text-muted-foreground">{percentLabel}</span>}
                   </div>
                   {!draft.customerId ? (
                     <p className="font-description mt-3 text-sm text-muted-foreground">Selecione um cliente para ver o saldo do pacote.</p>
-                  ) : selectedBalance.sold > 0 ? (
+                  ) : hasActivePackage && hasPackageLimit ? (
                     <>
-                      <div className="font-description mt-2 text-xs text-muted-foreground">{num(projectedUsed)}h de {num(selectedBalance.sold)}h utilizadas</div>
+                      <div className="font-description mt-2 text-xs text-muted-foreground">{num(projectedUsed)}h de {num(packageLimit)}h utilizadas neste pacote</div>
                       <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted" role="progressbar" aria-label={`Pacote usado ${percentLabel}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
-                        <div className={`h-full rounded-full transition-[width] ${projectedUsed > selectedBalance.sold ? "bg-destructive" : "bg-primary"}`} style={{ width: `${progress}%` }} />
+                        <div className={`h-full rounded-full transition-[width] ${projectedUsed > packageLimit ? "bg-destructive" : "bg-primary"}`} style={{ width: `${progress}%` }} />
                       </div>
                       <div className="font-description mt-2 flex justify-between text-xs text-muted-foreground">
-                        <span>Já consumidas {num(selectedBalance.used)}h</span>
-                        <span>Saldo após salvar {num(selectedBalance.sold - projectedUsed)}h</span>
+                        <span>{selectedBalance.packageStart ? "Neste pacote" : "Já consumidas"} {num(packageUsed)}h</span>
+                        <span>Após salvar {num(packageLimit - projectedUsed)}h restantes</span>
                       </div>
                     </>
                   ) : (
                     <>
-                      <p className="font-description mt-3 text-sm text-muted-foreground">Este cliente ainda não tem pacote pago registrado.</p>
+                      <p className="font-description mt-3 text-sm text-muted-foreground">
+                        {selectedBalance.packageLimit !== undefined
+                          ? `Limite de ${num(selectedBalance.packageLimit)}h definido para o próximo pacote pago.`
+                          : "Este cliente ainda não tem pacote pago nem limite definido."}
+                      </p>
                       <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted" role="progressbar" aria-label="Sem pacote pago" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}><div className="h-full w-0" /></div>
                     </>
                   )}

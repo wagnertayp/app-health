@@ -28,4 +28,9 @@ export interface CustomerInput {
   notes: string;
   /** @maxLength 250 */
   logoPath?: string;
+  /**
+     * Custom hour limit applied to each paid package
+     * @minimum 0
+     */
+  hoursLimit?: number;
 }

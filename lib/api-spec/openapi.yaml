@@ -501,6 +501,7 @@ components:
         responsible: { type: string, maxLength: 200 }
         notes: { type: string, maxLength: 5000 }
         logoPath: { type: string, maxLength: 250 }
+        hoursLimit: { type: number, minimum: 0, description: Custom hour limit applied to each paid package }
     Customer:
       allOf:
         - { $ref: "#/components/schemas/CustomerInput" }

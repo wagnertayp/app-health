@@ -633,6 +633,8 @@ export const listCustomersResponseOneNotesMax = 5000;
 
 export const listCustomersResponseOneLogoPathMax = 250;
 
+export const listCustomersResponseOneHoursLimitMin = 0;
+
 
 
 export const ListCustomersResponseItem = zod.object({
@@ -644,7 +646,8 @@ export const ListCustomersResponseItem = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(listCustomersResponseOneResponsibleMax),
   "notes": zod.string().max(listCustomersResponseOneNotesMax),
-  "logoPath": zod.string().max(listCustomersResponseOneLogoPathMax).optional()
+  "logoPath": zod.string().max(listCustomersResponseOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(listCustomersResponseOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -668,6 +671,8 @@ export const createCustomerBodyNotesMax = 5000;
 
 export const createCustomerBodyLogoPathMax = 250;
 
+export const createCustomerBodyHoursLimitMin = 0;
+
 
 
 export const CreateCustomerBody = zod.object({
@@ -679,7 +684,8 @@ export const CreateCustomerBody = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createCustomerBodyResponsibleMax),
   "notes": zod.string().max(createCustomerBodyNotesMax),
-  "logoPath": zod.string().max(createCustomerBodyLogoPathMax).optional()
+  "logoPath": zod.string().max(createCustomerBodyLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(createCustomerBodyHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 })
 
 export const createCustomerResponseOneNameMax = 200;
@@ -698,6 +704,8 @@ export const createCustomerResponseOneNotesMax = 5000;
 
 export const createCustomerResponseOneLogoPathMax = 250;
 
+export const createCustomerResponseOneHoursLimitMin = 0;
+
 
 
 export const CreateCustomerResponse = zod.object({
@@ -709,7 +717,8 @@ export const CreateCustomerResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createCustomerResponseOneResponsibleMax),
   "notes": zod.string().max(createCustomerResponseOneNotesMax),
-  "logoPath": zod.string().max(createCustomerResponseOneLogoPathMax).optional()
+  "logoPath": zod.string().max(createCustomerResponseOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(createCustomerResponseOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -736,6 +745,8 @@ export const updateCustomerBodyNotesMax = 5000;
 
 export const updateCustomerBodyLogoPathMax = 250;
 
+export const updateCustomerBodyHoursLimitMin = 0;
+
 
 
 export const UpdateCustomerBody = zod.object({
@@ -747,7 +758,8 @@ export const UpdateCustomerBody = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateCustomerBodyResponsibleMax),
   "notes": zod.string().max(updateCustomerBodyNotesMax),
-  "logoPath": zod.string().max(updateCustomerBodyLogoPathMax).optional()
+  "logoPath": zod.string().max(updateCustomerBodyLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(updateCustomerBodyHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 })
 
 export const updateCustomerResponseOneNameMax = 200;
@@ -766,6 +778,8 @@ export const updateCustomerResponseOneNotesMax = 5000;
 
 export const updateCustomerResponseOneLogoPathMax = 250;
 
+export const updateCustomerResponseOneHoursLimitMin = 0;
+
 
 
 export const UpdateCustomerResponse = zod.object({
@@ -777,7 +791,8 @@ export const UpdateCustomerResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateCustomerResponseOneResponsibleMax),
   "notes": zod.string().max(updateCustomerResponseOneNotesMax),
-  "logoPath": zod.string().max(updateCustomerResponseOneLogoPathMax).optional()
+  "logoPath": zod.string().max(updateCustomerResponseOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(updateCustomerResponseOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -807,6 +822,8 @@ export const listInvoicesResponseCustomerOneNotesMax = 5000;
 
 export const listInvoicesResponseCustomerOneLogoPathMax = 250;
 
+export const listInvoicesResponseCustomerOneHoursLimitMin = 0;
+
 export const listInvoicesResponseItemsItemDescriptionMax = 500;
 
 export const listInvoicesResponseItemsItemQuantityExclusiveMin = 0;
@@ -830,7 +847,8 @@ export const ListInvoicesResponseItem = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(listInvoicesResponseCustomerOneResponsibleMax),
   "notes": zod.string().max(listInvoicesResponseCustomerOneNotesMax),
-  "logoPath": zod.string().max(listInvoicesResponseCustomerOneLogoPathMax).optional()
+  "logoPath": zod.string().max(listInvoicesResponseCustomerOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(listInvoicesResponseCustomerOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -905,6 +923,8 @@ export const createInvoiceResponseCustomerOneNotesMax = 5000;
 
 export const createInvoiceResponseCustomerOneLogoPathMax = 250;
 
+export const createInvoiceResponseCustomerOneHoursLimitMin = 0;
+
 export const createInvoiceResponseItemsItemDescriptionMax = 500;
 
 export const createInvoiceResponseItemsItemQuantityExclusiveMin = 0;
@@ -928,7 +948,8 @@ export const CreateInvoiceResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createInvoiceResponseCustomerOneResponsibleMax),
   "notes": zod.string().max(createInvoiceResponseCustomerOneNotesMax),
-  "logoPath": zod.string().max(createInvoiceResponseCustomerOneLogoPathMax).optional()
+  "logoPath": zod.string().max(createInvoiceResponseCustomerOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(createInvoiceResponseCustomerOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -972,6 +993,8 @@ export const getInvoiceResponseCustomerOneNotesMax = 5000;
 
 export const getInvoiceResponseCustomerOneLogoPathMax = 250;
 
+export const getInvoiceResponseCustomerOneHoursLimitMin = 0;
+
 export const getInvoiceResponseItemsItemDescriptionMax = 500;
 
 export const getInvoiceResponseItemsItemQuantityExclusiveMin = 0;
@@ -995,7 +1018,8 @@ export const GetInvoiceResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(getInvoiceResponseCustomerOneResponsibleMax),
   "notes": zod.string().max(getInvoiceResponseCustomerOneNotesMax),
-  "logoPath": zod.string().max(getInvoiceResponseCustomerOneLogoPathMax).optional()
+  "logoPath": zod.string().max(getInvoiceResponseCustomerOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(getInvoiceResponseCustomerOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -1072,6 +1096,8 @@ export const updateInvoiceResponseCustomerOneNotesMax = 5000;
 
 export const updateInvoiceResponseCustomerOneLogoPathMax = 250;
 
+export const updateInvoiceResponseCustomerOneHoursLimitMin = 0;
+
 export const updateInvoiceResponseItemsItemDescriptionMax = 500;
 
 export const updateInvoiceResponseItemsItemQuantityExclusiveMin = 0;
@@ -1095,7 +1121,8 @@ export const UpdateInvoiceResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateInvoiceResponseCustomerOneResponsibleMax),
   "notes": zod.string().max(updateInvoiceResponseCustomerOneNotesMax),
-  "logoPath": zod.string().max(updateInvoiceResponseCustomerOneLogoPathMax).optional()
+  "logoPath": zod.string().max(updateInvoiceResponseCustomerOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(updateInvoiceResponseCustomerOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -1143,6 +1170,8 @@ export const updateInvoiceStatusResponseCustomerOneNotesMax = 5000;
 
 export const updateInvoiceStatusResponseCustomerOneLogoPathMax = 250;
 
+export const updateInvoiceStatusResponseCustomerOneHoursLimitMin = 0;
+
 export const updateInvoiceStatusResponseItemsItemDescriptionMax = 500;
 
 export const updateInvoiceStatusResponseItemsItemQuantityExclusiveMin = 0;
@@ -1166,7 +1195,8 @@ export const UpdateInvoiceStatusResponse = zod.object({
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateInvoiceStatusResponseCustomerOneResponsibleMax),
   "notes": zod.string().max(updateInvoiceStatusResponseCustomerOneNotesMax),
-  "logoPath": zod.string().max(updateInvoiceStatusResponseCustomerOneLogoPathMax).optional()
+  "logoPath": zod.string().max(updateInvoiceStatusResponseCustomerOneLogoPathMax).optional(),
+  "hoursLimit": zod.number().min(updateInvoiceStatusResponseCustomerOneHoursLimitMin).optional().describe('Custom hour limit applied to each paid package')
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()

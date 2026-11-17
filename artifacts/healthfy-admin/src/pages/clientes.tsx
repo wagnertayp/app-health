@@ -36,7 +36,7 @@ export function CustomerDialog({ open, onOpenChange, customer, initialData, onSa
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, customer?.id]);
-  const set = (k: keyof CustomerInput, v: string) => setF((s) => ({ ...s, [k]: v }));
+  const set = (k: Exclude<keyof CustomerInput, "hoursLimit">, v: string) => setF((s) => ({ ...s, [k]: v }));
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!f.name.trim()) return setErr("Informe o nome.");
@@ -57,6 +57,9 @@ export function CustomerDialog({ open, onOpenChange, customer, initialData, onSa
           <Field label="Situação"><select className="field" value={f.status} onChange={(e) => set("status", e.target.value)} data-testid="select-status"><option value="active">Ativo</option><option value="prospect">Prospecto</option><option value="inactive">Inativo</option></select></Field>
           <Field label="Endereço" className="sm:col-span-2"><input className="field" value={f.address} onChange={(e) => set("address", e.target.value)} data-testid="input-address" /></Field>
           <Field label="Responsável" className="sm:col-span-2"><input className="field" value={f.responsible} onChange={(e) => set("responsible", e.target.value)} data-testid="input-responsible" /></Field>
+          <Field label="Limite por pacote pago (horas)" hint="Vazio usa as horas da invoice paga mais recente.">
+            <input className="field" type="number" min="0" step="0.5" value={f.hoursLimit ?? ""} onChange={(e) => setF((s) => ({ ...s, hoursLimit: e.target.value === "" ? undefined : Number(e.target.value) }))} data-testid="input-customer-hours-limit" />
+          </Field>
           <Field label="Observações internas" className="sm:col-span-2"><textarea className="field" value={f.notes} onChange={(e) => set("notes", e.target.value)} data-testid="input-notes" /></Field>
           {err && <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive sm:col-span-2" data-testid="text-form-error">{err}</p>}
           <DialogFooter className="sm:col-span-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button><Button type="submit" disabled={uploading || create.isPending || update.isPending} data-testid="button-save">{uploading ? "Enviando logo..." : "Salvar"}</Button></DialogFooter>
