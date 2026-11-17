@@ -31,7 +31,7 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 
 ## Architecture decisions
 
-- The initial build is a workspace preview, without a configured identity provider. Administrative APIs fail closed with 503 in production until managed authentication and authorization are implemented. Do not remove this guard without protecting every administrative endpoint.
+- Administrative routes require Replit OIDC sessions and an email allowlist in `ADMIN_EMAILS`. An authenticated account is not automatically an administrator. Keep customer data, financial data and uploads protected in development and production; the checkout remains public.
 - The user declined connecting a payment provider. Checkout stores a purchase request and creates a CRM lead, never a payment confirmation. Do not collect card data or fabricate Pix QR codes.
 - Invoice amounts and customer information are snapshots. Later product/customer edits must not alter issued documents. Numbers come from a database sequence, not list counts.
 - Financial values use BRL; totals round to centavos. Manual transactions and invoices are independent sources and should not duplicate the same revenue.
@@ -47,13 +47,16 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 
 - Follow the supplied Healthfy brief: dark collapsible sidebar, predominantly white content, restrained Shopify-inspired professional presentation.
 - Use the supplied Stage Grotesk family for interface typography and Arial for descriptions. Avoid subtitles; keep necessary form guidance and operational warnings.
+- Clientes should use the supplied interactive glass-folder pattern, with the client's/company's name and uploaded logo highly visible. Preserve projects, invoices and customer actions.
+- Multi Agenda should remain a light calendar with large day cells, names and photo avatars for every participant, visible labels, and combinable filters.
 - Keep Projetos nested inside Clientes, never a standalone top-level sidebar module.
 - Do not present fictitious operational data as real or include decorative nonfunctional actions.
 
 ## Gotchas
 
 - Generated fetch clients require `dom.iterable` in their TypeScript lib list. Orval query generation is pinned to React Query v5.
-- Product banners accept HTTPS URLs only; uploaded file storage has not been configured.
+- Product banners accept HTTPS URLs only. Client logos use protected App Storage uploads (PNG/JPG/WebP, up to 5 MB); PostgreSQL stores paths/metadata, never image bytes or base64.
+- Customer logo upload requests require authorized sessions. Logos are validated against upload ownership, actual MIME, size and raster signatures before being attached; existing clients without logos remain valid.
 - Only draft invoices can be deleted; issued invoices should be cancelled to preserve audit history.
 
 ## Pointers

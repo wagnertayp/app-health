@@ -5,6 +5,8 @@ import {
   ListActivityResponse,
 } from "@workspace/api-zod";
 import { activity, find, insert, list, remove, replace } from "../lib/healthfy-store";
+import { appointmentPhotoPaths } from "../lib/appointment-people";
+import { validateOwnedLogo } from "../lib/customer-logos";
 
 const router: IRouter = Router();
 type ModuleRecord = typeof CreateRecordResponse._output;
@@ -45,6 +47,19 @@ async function save(req: Request, res: Response, editing: boolean): Promise<void
   }
   const old = editing ? await find<ModuleRecord>(kind, req.params.id) : undefined;
   if (editing && !old) { res.status(404).json({ error: "Registro não encontrado." }); return; }
+  if (kind === "appointments") {
+    if (!input.responsible.trim()) { res.status(400).json({ error: "Informe o responsável pelo compromisso." }); return; }
+    try {
+      const photoPaths = appointmentPhotoPaths(input.metadata);
+      let previous: string[] = [];
+      try { previous = appointmentPhotoPaths(old?.metadata ?? {}); } catch { /* Invalid legacy metadata is never trusted as an approved image. */ }
+      for (const path of photoPaths) {
+        if (!previous.includes(path)) await validateOwnedLogo(path, req.user!.id);
+      }
+    } catch (error) {
+      res.status(400).json({ error: error instanceof Error ? error.message : "Confira as fotos e os participantes." }); return;
+    }
+  }
   const entity = await db.transaction(async tx => {
     const result = old ? { ...input, id: old.id, kind, createdAt: old.createdAt }
       : (await insert(kind, { ...input, kind }, tx)).entity;

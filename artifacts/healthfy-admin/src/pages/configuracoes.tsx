@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ShieldAlert } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useSession } from "@/components/auth-gate";
 import { Field, Notice, PageHeader, Panel } from "@/components/kit";
 import { DEFAULT_TERMS, getPrefs, setPrefs, usePageMeta } from "@/lib/format";
 
@@ -9,10 +10,11 @@ export default function Configuracoes() {
   usePageMeta("Configurações", "Preferências locais do workspace Healthfy.");
   const [p, setP] = useState(getPrefs);
   const { toast } = useToast();
+  const session = useSession();
   return (
     <div className="max-w-2xl space-y-6">
       <PageHeader title="Configurações" subtitle="Preferências salvas apenas neste navegador." />
-      <Notice icon={ShieldAlert} title="Workspace em pré-visualização">Não há autenticação configurada. Este painel não deve ser exposto publicamente até que o acesso seja protegido.</Notice>
+      <Notice tone="green" icon={ShieldCheck} title={`Acesso protegido${session ? " · " + session.name : ""}`}>Sessão autenticada. Somente contas autorizadas acessam este painel.</Notice>
       <Panel title="Preferências">
         <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setPrefs(p); toast({ title: "Preferências salvas" }); }}>
           <Field label="Seu nome (saudação do dashboard)"><input className="field" value={p.ownerName} onChange={(e) => setP({ ...p, ownerName: e.target.value })} data-testid="input-owner" /></Field>

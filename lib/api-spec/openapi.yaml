@@ -6,6 +6,60 @@ info:
 servers:
   - url: /api
 paths:
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      responses:
+        "200":
+          description: Current browser session
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
+  /login:
+    get:
+      operationId: beginBrowserLogin
+      parameters:
+        - { name: returnTo, in: query, schema: { type: string } }
+      responses:
+        "302": { description: Redirect to identity provider }
+  /callback:
+    get:
+      operationId: handleBrowserLoginCallback
+      responses:
+        "302": { description: Complete login and return to app }
+  /logout:
+    get:
+      operationId: logoutBrowserSession
+      responses:
+        "302": { description: End session }
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadUrlRequest" }
+      responses:
+        "200":
+          description: Authorized direct upload URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadUrlResponse" }
+  /storage/public-objects/{filePath}:
+    get:
+      operationId: getPublicObject
+      parameters:
+        - { name: filePath, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Public asset bytes }
+  /storage/objects/{objectPath}:
+    get:
+      operationId: getStorageObject
+      parameters:
+        - { name: objectPath, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Protected image bytes }
   /healthz:
     get:
       operationId: healthCheck
@@ -248,6 +302,38 @@ paths:
               schema: { type: array, items: { $ref: "#/components/schemas/Activity" } }
 components:
   schemas:
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id: { type: string }
+        email: { type: ["string", "null"] }
+        firstName: { type: ["string", "null"] }
+        lastName: { type: ["string", "null"] }
+        profileImageUrl: { type: ["string", "null"] }
+        isAdmin: { type: boolean }
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - { $ref: "#/components/schemas/AuthUser" }
+            - { type: "null" }
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 250 }
+        size: { type: integer, minimum: 1, maximum: 5242880 }
+        contentType: { type: string, enum: [image/png, image/jpeg, image/webp] }
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string }
+        objectPath: { type: string }
+        metadata: { $ref: "#/components/schemas/UploadUrlRequest" }
     HealthStatus:
       type: object
       required: [status]
@@ -288,6 +374,7 @@ components:
         status: { type: string, enum: [active, inactive, prospect] }
         responsible: { type: string, maxLength: 200 }
         notes: { type: string, maxLength: 5000 }
+        logoPath: { type: string, maxLength: 250 }
     Customer:
       allOf:
         - { $ref: "#/components/schemas/CustomerInput" }

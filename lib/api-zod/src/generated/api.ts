@@ -8,6 +8,74 @@
 import * as zod from 'zod';
 
 
+export const GetCurrentAuthUserResponse = zod.object({
+  "user": zod.union([zod.object({
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable(),
+  "isAdmin": zod.boolean().optional()
+}),zod.null()])
+})
+
+
+export const BeginBrowserLoginQueryParams = zod.object({
+  "returnTo": zod.coerce.string().optional()
+})
+
+export const BeginBrowserLoginResponse = zod.void()
+
+
+export const HandleBrowserLoginCallbackResponse = zod.void()
+
+
+export const LogoutBrowserSessionResponse = zod.void()
+
+
+export const requestUploadUrlBodyNameMax = 250;
+
+export const requestUploadUrlBodySizeMax = 5242880;
+
+
+
+export const RequestUploadUrlBody = zod.object({
+  "name": zod.string().min(1).max(requestUploadUrlBodyNameMax),
+  "size": zod.number().int().min(1).max(requestUploadUrlBodySizeMax),
+  "contentType": zod.enum(['image/png', 'image/jpeg', 'image/webp'])
+})
+
+export const requestUploadUrlResponseMetadataNameMax = 250;
+
+export const requestUploadUrlResponseMetadataSizeMax = 5242880;
+
+
+
+export const RequestUploadUrlResponse = zod.object({
+  "uploadURL": zod.string(),
+  "objectPath": zod.string(),
+  "metadata": zod.object({
+  "name": zod.string().min(1).max(requestUploadUrlResponseMetadataNameMax),
+  "size": zod.number().int().min(1).max(requestUploadUrlResponseMetadataSizeMax),
+  "contentType": zod.enum(['image/png', 'image/jpeg', 'image/webp'])
+}).optional()
+})
+
+
+export const GetPublicObjectParams = zod.object({
+  "filePath": zod.coerce.string()
+})
+
+export const GetPublicObjectResponse = zod.unknown()
+
+
+export const GetStorageObjectParams = zod.object({
+  "objectPath": zod.coerce.string()
+})
+
+export const GetStorageObjectResponse = zod.unknown()
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.string()
 })
@@ -303,6 +371,8 @@ export const listCustomersResponseOneResponsibleMax = 200;
 
 export const listCustomersResponseOneNotesMax = 5000;
 
+export const listCustomersResponseOneLogoPathMax = 250;
+
 
 
 export const ListCustomersResponseItem = zod.object({
@@ -313,7 +383,8 @@ export const ListCustomersResponseItem = zod.object({
   "address": zod.string().max(listCustomersResponseOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(listCustomersResponseOneResponsibleMax),
-  "notes": zod.string().max(listCustomersResponseOneNotesMax)
+  "notes": zod.string().max(listCustomersResponseOneNotesMax),
+  "logoPath": zod.string().max(listCustomersResponseOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -335,6 +406,8 @@ export const createCustomerBodyResponsibleMax = 200;
 
 export const createCustomerBodyNotesMax = 5000;
 
+export const createCustomerBodyLogoPathMax = 250;
+
 
 
 export const CreateCustomerBody = zod.object({
@@ -345,7 +418,8 @@ export const CreateCustomerBody = zod.object({
   "address": zod.string().max(createCustomerBodyAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createCustomerBodyResponsibleMax),
-  "notes": zod.string().max(createCustomerBodyNotesMax)
+  "notes": zod.string().max(createCustomerBodyNotesMax),
+  "logoPath": zod.string().max(createCustomerBodyLogoPathMax).optional()
 })
 
 export const createCustomerResponseOneNameMax = 200;
@@ -362,6 +436,8 @@ export const createCustomerResponseOneResponsibleMax = 200;
 
 export const createCustomerResponseOneNotesMax = 5000;
 
+export const createCustomerResponseOneLogoPathMax = 250;
+
 
 
 export const CreateCustomerResponse = zod.object({
@@ -372,7 +448,8 @@ export const CreateCustomerResponse = zod.object({
   "address": zod.string().max(createCustomerResponseOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createCustomerResponseOneResponsibleMax),
-  "notes": zod.string().max(createCustomerResponseOneNotesMax)
+  "notes": zod.string().max(createCustomerResponseOneNotesMax),
+  "logoPath": zod.string().max(createCustomerResponseOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -397,6 +474,8 @@ export const updateCustomerBodyResponsibleMax = 200;
 
 export const updateCustomerBodyNotesMax = 5000;
 
+export const updateCustomerBodyLogoPathMax = 250;
+
 
 
 export const UpdateCustomerBody = zod.object({
@@ -407,7 +486,8 @@ export const UpdateCustomerBody = zod.object({
   "address": zod.string().max(updateCustomerBodyAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateCustomerBodyResponsibleMax),
-  "notes": zod.string().max(updateCustomerBodyNotesMax)
+  "notes": zod.string().max(updateCustomerBodyNotesMax),
+  "logoPath": zod.string().max(updateCustomerBodyLogoPathMax).optional()
 })
 
 export const updateCustomerResponseOneNameMax = 200;
@@ -424,6 +504,8 @@ export const updateCustomerResponseOneResponsibleMax = 200;
 
 export const updateCustomerResponseOneNotesMax = 5000;
 
+export const updateCustomerResponseOneLogoPathMax = 250;
+
 
 
 export const UpdateCustomerResponse = zod.object({
@@ -434,7 +516,8 @@ export const UpdateCustomerResponse = zod.object({
   "address": zod.string().max(updateCustomerResponseOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateCustomerResponseOneResponsibleMax),
-  "notes": zod.string().max(updateCustomerResponseOneNotesMax)
+  "notes": zod.string().max(updateCustomerResponseOneNotesMax),
+  "logoPath": zod.string().max(updateCustomerResponseOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -462,6 +545,8 @@ export const listInvoicesResponseCustomerOneResponsibleMax = 200;
 
 export const listInvoicesResponseCustomerOneNotesMax = 5000;
 
+export const listInvoicesResponseCustomerOneLogoPathMax = 250;
+
 export const listInvoicesResponseItemsItemDescriptionMax = 500;
 
 export const listInvoicesResponseItemsItemQuantityExclusiveMin = 0;
@@ -484,7 +569,8 @@ export const ListInvoicesResponseItem = zod.object({
   "address": zod.string().max(listInvoicesResponseCustomerOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(listInvoicesResponseCustomerOneResponsibleMax),
-  "notes": zod.string().max(listInvoicesResponseCustomerOneNotesMax)
+  "notes": zod.string().max(listInvoicesResponseCustomerOneNotesMax),
+  "logoPath": zod.string().max(listInvoicesResponseCustomerOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -557,6 +643,8 @@ export const createInvoiceResponseCustomerOneResponsibleMax = 200;
 
 export const createInvoiceResponseCustomerOneNotesMax = 5000;
 
+export const createInvoiceResponseCustomerOneLogoPathMax = 250;
+
 export const createInvoiceResponseItemsItemDescriptionMax = 500;
 
 export const createInvoiceResponseItemsItemQuantityExclusiveMin = 0;
@@ -579,7 +667,8 @@ export const CreateInvoiceResponse = zod.object({
   "address": zod.string().max(createInvoiceResponseCustomerOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(createInvoiceResponseCustomerOneResponsibleMax),
-  "notes": zod.string().max(createInvoiceResponseCustomerOneNotesMax)
+  "notes": zod.string().max(createInvoiceResponseCustomerOneNotesMax),
+  "logoPath": zod.string().max(createInvoiceResponseCustomerOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -621,6 +710,8 @@ export const getInvoiceResponseCustomerOneResponsibleMax = 200;
 
 export const getInvoiceResponseCustomerOneNotesMax = 5000;
 
+export const getInvoiceResponseCustomerOneLogoPathMax = 250;
+
 export const getInvoiceResponseItemsItemDescriptionMax = 500;
 
 export const getInvoiceResponseItemsItemQuantityExclusiveMin = 0;
@@ -643,7 +734,8 @@ export const GetInvoiceResponse = zod.object({
   "address": zod.string().max(getInvoiceResponseCustomerOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(getInvoiceResponseCustomerOneResponsibleMax),
-  "notes": zod.string().max(getInvoiceResponseCustomerOneNotesMax)
+  "notes": zod.string().max(getInvoiceResponseCustomerOneNotesMax),
+  "logoPath": zod.string().max(getInvoiceResponseCustomerOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()
@@ -689,6 +781,8 @@ export const updateInvoiceStatusResponseCustomerOneResponsibleMax = 200;
 
 export const updateInvoiceStatusResponseCustomerOneNotesMax = 5000;
 
+export const updateInvoiceStatusResponseCustomerOneLogoPathMax = 250;
+
 export const updateInvoiceStatusResponseItemsItemDescriptionMax = 500;
 
 export const updateInvoiceStatusResponseItemsItemQuantityExclusiveMin = 0;
@@ -711,7 +805,8 @@ export const UpdateInvoiceStatusResponse = zod.object({
   "address": zod.string().max(updateInvoiceStatusResponseCustomerOneAddressMax),
   "status": zod.enum(['active', 'inactive', 'prospect']),
   "responsible": zod.string().max(updateInvoiceStatusResponseCustomerOneResponsibleMax),
-  "notes": zod.string().max(updateInvoiceStatusResponseCustomerOneNotesMax)
+  "notes": zod.string().max(updateInvoiceStatusResponseCustomerOneNotesMax),
+  "logoPath": zod.string().max(updateInvoiceStatusResponseCustomerOneLogoPathMax).optional()
 }).and(zod.object({
   "id": zod.string(),
   "createdAt": zod.string()

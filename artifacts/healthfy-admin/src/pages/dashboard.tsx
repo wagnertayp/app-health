@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Activity as ActivityIcon, AlertCircle, CalendarClock, FolderKanban, Percent, Receipt, Users, Wallet } from "lucide-react";
 import { useGetOverview, getGetOverviewQueryKey, useListActivity, useListInvoices } from "@workspace/api-client-react";
-import { EmptyState, ErrorState, LoadingRows, PageHeader, Panel, Segmented, Stat } from "@/components/kit";
+import { EmptyState, ErrorState, LoadingRows, PageHeader, Panel, Segmented } from "@/components/kit";
+import { PeakStatCard } from "@/components/ui/peak-stat-card";
 import { MoneyChart } from "@/components/money-chart";
 import { useRecords } from "@/components/records";
 import { brl, getPrefs, isOverdue, localISO, num, relative, usePageMeta } from "@/lib/format";
@@ -45,15 +46,15 @@ export default function Dashboard() {
     <div className="space-y-6">
       <PageHeader eyebrow={new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })} title={`${greet}${owner ? `, ${owner}` : ""}.`} subtitle="Os números abaixo vêm apenas de registros reais do workspace." actions={<Segmented testId="filter-days" value={days} onChange={setDays} options={[{ value: "7", label: "7 dias" }, { value: "30", label: "30 dias" }, { value: "90", label: "90 dias" }]} />} />
       {ov.isError ? <ErrorState error={ov.error} onRetry={() => ov.refetch()} /> : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Stat label="Clientes" icon={Users} value={o?.customers ?? "—"} testId="stat-customers" />
-          <Stat label="Projetos ativos" icon={FolderKanban} value={o?.activeProjects ?? "—"} testId="stat-projects" />
-          <Stat label={`Receita (${days}d)`} icon={Receipt} value={o ? brl(o.revenue) : "—"} hint="Pagamentos registrados manualmente" testId="stat-revenue" />
-          <Stat label="A receber" icon={Wallet} value={o ? brl(o.receivable) : "—"} testId="stat-receivable" />
-          <Stat label="Despesas" icon={Wallet} value={o ? brl(o.expenses) : "—"} testId="stat-expenses" />
-          <Stat label="Agendamentos" icon={CalendarClock} value={o?.appointments ?? "—"} testId="stat-appointments" />
-          <Stat label="Conversão de leads" icon={Percent} value={o ? `${num(o.conversion)}%` : "—"} testId="stat-conversion" />
-          <Stat label="Horas vendidas / usadas" icon={ActivityIcon} value={o ? `${num(o.hoursSold)} / ${num(o.hoursUsed)}` : "—"} testId="stat-hours" />
+        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+          <PeakStatCard label="Clientes" icon={Users} value={o?.customers ?? "—"} testId="stat-customers" />
+          <PeakStatCard label="Projetos ativos" icon={FolderKanban} value={o?.activeProjects ?? "—"} testId="stat-projects" />
+          <PeakStatCard label={`Receita (${days}d)`} icon={Receipt} value={o ? brl(o.revenue) : "—"} hint="Pagamentos registrados manualmente" testId="stat-revenue" />
+          <PeakStatCard label="A receber" icon={Wallet} value={o ? brl(o.receivable) : "—"} testId="stat-receivable" />
+          <PeakStatCard label="Despesas" icon={Wallet} value={o ? brl(o.expenses) : "—"} testId="stat-expenses" />
+          <PeakStatCard label="Agendamentos" icon={CalendarClock} value={o?.appointments ?? "—"} testId="stat-appointments" />
+          <PeakStatCard label="Conversão de leads" icon={Percent} value={o ? `${num(o.conversion)}%` : "—"} testId="stat-conversion" />
+          <PeakStatCard label="Horas vendidas / usadas" icon={ActivityIcon} value={o ? `${num(o.hoursSold)} / ${num(o.hoursUsed)}` : "—"} testId="stat-hours" />
         </div>
       )}
       <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">

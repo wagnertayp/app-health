@@ -7,6 +7,9 @@
  */
 
 export * from './activity';
+export * from './authUser';
+export * from './authUserEnvelope';
+export * from './beginBrowserLoginParams';
 export * from './checkout';
 export * from './checkoutInput';
 export * from './customer';
@@ -34,3 +37,6 @@ export * from './recordInputMetadata';
 export * from './recordInputPriority';
 export * from './recordKind';
 export * from './revenuePoint';
+export * from './uploadUrlRequest';
+export * from './uploadUrlRequestContentType';
+export * from './uploadUrlResponse';

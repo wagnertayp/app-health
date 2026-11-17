@@ -5,6 +5,7 @@ import {
   CreateCustomerBody, GetInvoiceResponse, ListCustomersResponse, CreateCustomerResponse,
 } from "@workspace/api-zod";
 import { activity, find, insert, list, remove, replace, type Entity } from "../lib/healthfy-store";
+import { validateOwnedLogo } from "../lib/customer-logos";
 
 const router: IRouter = Router();
 type Product = typeof GetProductResponse._output;
@@ -67,9 +68,16 @@ async function saveCustomer(req: Request, res: Response, editing: boolean): Prom
   if (!parsed.success || !parsed.data.name.trim()) { res.status(400).json({ error: "Confira os dados do cliente." }); return; }
   const old = editing ? await find<Customer>("customers", req.params.id) : undefined;
   if (editing && !old) { res.status(404).json({ error: "Cliente não encontrado." }); return; }
+  if (parsed.data.logoPath && parsed.data.logoPath !== old?.logoPath) {
+    try { await validateOwnedLogo(parsed.data.logoPath, req.user!.id); }
+    catch (error) {
+      res.status(400).json({ error: error instanceof Error ? error.message : "Não foi possível validar a logo." }); return;
+    }
+  }
+  const input = { ...parsed.data, logoPath: parsed.data.logoPath ?? old?.logoPath ?? "" };
   const entity = await db.transaction(async tx => {
-    const customer = old ? { ...parsed.data, id: old.id, createdAt: old.createdAt }
-      : (await insert("customers", parsed.data, tx)).entity;
+    const customer = old ? { ...input, id: old.id, createdAt: old.createdAt }
+      : (await insert("customers", input, tx)).entity;
     if (old) await replace("customers", old.id, customer, tx);
     await activity(old ? "Cliente atualizado" : "Cliente cadastrado", parsed.data.name, "customers", customer.id, tx);
     return customer;

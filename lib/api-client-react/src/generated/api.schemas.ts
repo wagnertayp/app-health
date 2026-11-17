@@ -5,6 +5,52 @@
  * Healthfy management API
  * OpenAPI spec version: 0.1.0
  */
+export interface AuthUser {
+  id: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  firstName: string | null;
+  /** @nullable */
+  lastName: string | null;
+  /** @nullable */
+  profileImageUrl: string | null;
+  isAdmin?: boolean;
+}
+
+export interface AuthUserEnvelope {
+  user: AuthUser | null;
+}
+
+export type UploadUrlRequestContentType = typeof UploadUrlRequestContentType[keyof typeof UploadUrlRequestContentType];
+
+
+export const UploadUrlRequestContentType = {
+  'image/png': 'image/png',
+  'image/jpeg': 'image/jpeg',
+  'image/webp': 'image/webp',
+} as const;
+
+export interface UploadUrlRequest {
+  /**
+     * @minLength 1
+     * @maxLength 250
+     */
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 5242880
+     */
+  size: number;
+  contentType: UploadUrlRequestContentType;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -83,6 +129,8 @@ export interface CustomerInput {
   responsible: string;
   /** @maxLength 5000 */
   notes: string;
+  /** @maxLength 250 */
+  logoPath?: string;
 }
 
 export type Customer = CustomerInput & {
@@ -314,6 +362,10 @@ export interface PurchaseRequest {
   message: string;
   total: number;
 }
+
+export type BeginBrowserLoginParams = {
+returnTo?: string;
+};
 
 export type GetOverviewParams = {
 days?: number;

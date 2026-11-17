@@ -26,4 +26,6 @@ export interface CustomerInput {
   responsible: string;
   /** @maxLength 5000 */
   notes: string;
+  /** @maxLength 250 */
+  logoPath?: string;
 }

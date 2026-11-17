@@ -1,0 +1,1 @@
+- [App Storage SDK compatibility](storage-sdk-compatibility.md) — keep sidecar-compatible Google client majors; upload URLs alone do not validate server-side storage access.

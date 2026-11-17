@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { Shell } from '@/components/shell';
+import { AuthGate } from '@/components/auth-gate';
 import FinanceHome from '@/pages/finance-home';
 import Dashboard from '@/pages/dashboard';
 import Crm from '@/pages/crm';
@@ -39,6 +40,7 @@ function Router() {
     );
   }
   return (
+    <AuthGate>
     <Shell>
       <RoutedErrorBoundary>
         <Switch>
@@ -64,6 +66,7 @@ function Router() {
         </Switch>
       </RoutedErrorBoundary>
     </Shell>
+    </AuthGate>
   );
 }
 

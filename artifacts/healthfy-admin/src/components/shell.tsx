@@ -15,7 +15,7 @@ import {
   PanelLeftOpen,
   Menu,
   X,
-  ShieldAlert,
+  LogOut,
   FileText,
   Package,
   Timer,
@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/components/auth-gate";
 import logo from "@assets/HEALTH_SEM_FUNDO_1794883543830.png";
 
 type Item = { label: string; href: string; icon: LucideIcon; match?: (p: string) => boolean; children?: Item[] };
@@ -171,6 +172,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem("healthfy.sidebar") === "1");
   const [mobile, setMobile] = useState(false);
   const [p] = useLocation();
+  const session = useSession();
   useEffect(() => setMobile(false), [p]);
   const toggle = () =>
     setCollapsed((c) => {
@@ -198,11 +200,15 @@ export function Shell({ children }: { children: ReactNode }) {
           </button>
           <img src={logo} alt="" className="h-7 w-7 rounded-md md:hidden" />
           <div className="flex-1" />
-          <div className="flex items-center gap-1.5 rounded-full border border-[hsl(40_70%_80%)] bg-[hsl(42_90%_95%)] px-2.5 py-1 text-[11px] font-medium text-[hsl(30_70%_30%)]" data-testid="status-preview">
-            <ShieldAlert className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Workspace em pré-visualização · sem autenticação</span>
-            <span className="sm:hidden">Pré-visualização</span>
-          </div>
+          {session && (
+            <div className="flex items-center gap-2" data-testid="status-session">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">{session.initials}</div>
+              <span className="hidden max-w-[180px] truncate text-[13px] font-medium sm:inline" data-testid="text-user-name">{session.name}</span>
+              <button onClick={session.signOut} className="ml-1 flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-[12px] font-medium hover:bg-muted" data-testid="button-logout">
+                <LogOut className="h-3.5 w-3.5" /><span className="hidden sm:inline">Sair</span>
+              </button>
+            </div>
+          )}
         </header>
         <main key={p} className="fade-up mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 md:px-8 md:py-8">
           {children}
