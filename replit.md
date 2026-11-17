@@ -45,6 +45,9 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 
 ## User preferences
 
+- The user wants to enter the panel with a normal email-and-password form, without depending on Replit sign-in. Preserve the existing administrative allowlist when changing authentication.
+- The user explicitly requested removing checkout functionality. Preserve the product catalog, customers, invoices and existing records; do not reintroduce public purchase pages.
+
 - Follow the supplied Healthfy brief: dark collapsible sidebar, predominantly white content, restrained Shopify-inspired professional presentation.
 - Use the supplied Stage Grotesk family for interface typography and Arial for descriptions. Avoid subtitles; keep necessary form guidance and operational warnings.
 - Clientes should use the supplied interactive glass-folder pattern, with the client's/company's name and uploaded logo highly visible. Preserve projects, invoices and customer actions.
