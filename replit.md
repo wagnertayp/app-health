@@ -1,10 +1,11 @@
-# [Project name]
+# Healthfy Admin
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Painel em português para a operação da Healthfy IA: clientes, produtos, banco de horas, invoices e páginas de checkout personalizadas.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/healthfy-admin run dev` — frontend (use its managed workflow for the assigned port/base path)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -22,23 +23,37 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/healthfy-admin/src/` — React frontend, administrative and public checkout routes
+- `artifacts/api-server/src/routes/` — catalog, invoices, operational records, checkout and overview
+- `artifacts/api-server/src/lib/healthfy-store.ts` — entity persistence and activity recording
+- `lib/db/src/schema/healthfy.ts` — PostgreSQL entity storage
+- `lib/api-spec/openapi.yaml` — source of truth for API contracts; regenerate clients after editing
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The initial build is a workspace preview, without a configured identity provider. Administrative APIs fail closed with 503 in production until managed authentication and authorization are implemented. Do not remove this guard without protecting every administrative endpoint.
+- The user declined connecting a payment provider. Checkout stores a purchase request and creates a CRM lead, never a payment confirmation. Do not collect card data or fabricate Pix QR codes.
+- Invoice amounts and customer information are snapshots. Later product/customer edits must not alter issued documents. Numbers come from a database sequence, not list counts.
+- Financial values use BRL; totals round to centavos. Manual transactions and invoices are independent sources and should not duplicate the same revenue.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Product catalog supports hours, services and digital goods with HTTPS banner URL, checkout copy, accent color and payment terms.
+- The initial reference product is based on the supplied contract: 10 hours at R$200/hour, R$2,000 total, R$1,000 entry and R$1,000 at completion.
+- Invoices are non-fiscal billing documents, printable via the browser. Paid status is a manual administrative declaration, not gateway verification.
+- CRM, projects, agenda, agent configuration, tracking and hour records are persisted operational records. No external calendar, ad platform or AI runtime is connected.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Follow the supplied Healthfy brief: dark collapsible sidebar, predominantly white content, restrained Shopify-inspired professional presentation.
+- Keep Projetos nested inside Clientes, never a standalone top-level sidebar module.
+- Do not present fictitious operational data as real or include decorative nonfunctional actions.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Generated fetch clients require `dom.iterable` in their TypeScript lib list. Orval query generation is pinned to React Query v5.
+- Product banners accept HTTPS URLs only; uploaded file storage has not been configured.
+- Only draft invoices can be deleted; issued invoices should be cancelled to preserve audit history.
 
 ## Pointers
 

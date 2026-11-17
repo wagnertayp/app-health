@@ -1,36 +1,438 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Healthfy management API
 servers:
   - url: /api
-    description: Base API path
-tags:
-  - name: health
-    description: Health operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
-      tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/HealthStatus"
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /overview:
+    get:
+      operationId: getOverview
+      parameters:
+        - { name: days, in: query, schema: { type: integer, default: 30 } }
+      responses:
+        "200":
+          description: Real operational summary
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Overview" }
+  /products:
+    get:
+      operationId: listProducts
+      responses:
+        "200":
+          description: Products
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Product" } }
+    post:
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+  /products/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getProduct
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+    put:
+      operationId: updateProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+    delete:
+      operationId: deleteProduct
+      responses:
+        "204": { description: Deleted }
+  /customers:
+    get:
+      operationId: listCustomers
+      responses:
+        "200":
+          description: Customers
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Customer" } }
+    post:
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+  /customers/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    put:
+      operationId: updateCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerInput" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    delete:
+      operationId: deleteCustomer
+      responses:
+        "204": { description: Deleted }
+  /invoices:
+    get:
+      operationId: listInvoices
+      responses:
+        "200":
+          description: Invoices
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Invoice" } }
+    post:
+      operationId: createInvoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceInput" }
+      responses:
+        "201":
+          description: Created with calculated totals and customer snapshot
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+  /invoices/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getInvoice
+      responses:
+        "200":
+          description: Invoice
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+    patch:
+      operationId: updateInvoiceStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceStatusInput" }
+      responses:
+        "200":
+          description: Manual status update
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+    delete:
+      operationId: deleteInvoice
+      responses:
+        "204": { description: Draft deleted }
+  /records/{kind}:
+    parameters:
+      - { name: kind, in: path, required: true, schema: { $ref: "#/components/schemas/RecordKind" } }
+    get:
+      operationId: listRecords
+      responses:
+        "200":
+          description: Module records
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/ModuleRecord" } }
+    post:
+      operationId: createRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ModuleRecord" }
+  /records/{kind}/{id}:
+    parameters:
+      - { name: kind, in: path, required: true, schema: { $ref: "#/components/schemas/RecordKind" } }
+      - { name: id, in: path, required: true, schema: { type: string } }
+    put:
+      operationId: updateRecord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordInput" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ModuleRecord" }
+    delete:
+      operationId: deleteRecord
+      responses:
+        "204": { description: Deleted }
+  /checkout/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getCheckout
+      responses:
+        "200":
+          description: Public active product and payment connection state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Checkout" }
+    post:
+      operationId: submitCheckout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutInput" }
+      responses:
+        "201":
+          description: Purchase request registered, not payment confirmation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PurchaseRequest" }
+  /activity:
+    get:
+      operationId: listActivity
+      responses:
+        "200":
+          description: Latest actions
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Activity" } }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+    ProductInput:
+      type: object
+      required: [name, description, type, price, hours, active, bannerUrl, checkoutTitle, checkoutDescription, accentColor, paymentTerms]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 5000 }
+        type: { type: string, enum: [hours, service, digital] }
+        price: { type: number, minimum: 0.01, maximum: 10000000 }
+        hours: { type: number, minimum: 0, maximum: 100000 }
+        active: { type: boolean }
+        bannerUrl: { type: string, maxLength: 2000 }
+        checkoutTitle: { type: string, maxLength: 250 }
+        checkoutDescription: { type: string, maxLength: 5000 }
+        accentColor: { type: string, pattern: "^#[0-9a-fA-F]{6}$" }
+        paymentTerms: { type: string, maxLength: 3000 }
+    Product:
+      allOf:
+        - { $ref: "#/components/schemas/ProductInput" }
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: string }
+            createdAt: { type: string }
+    CustomerInput:
+      type: object
+      required: [name, email, phone, document, address, status, responsible, notes]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        email: { type: string, maxLength: 250 }
+        phone: { type: string, maxLength: 60 }
+        document: { type: string, maxLength: 60 }
+        address: { type: string, maxLength: 500 }
+        status: { type: string, enum: [active, inactive, prospect] }
+        responsible: { type: string, maxLength: 200 }
+        notes: { type: string, maxLength: 5000 }
+    Customer:
+      allOf:
+        - { $ref: "#/components/schemas/CustomerInput" }
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: string }
+            createdAt: { type: string }
+    InvoiceLineInput:
+      type: object
+      required: [description, quantity, unitPrice]
+      properties:
+        productId: { type: string }
+        description: { type: string, minLength: 1, maxLength: 500 }
+        quantity: { type: number, exclusiveMinimum: 0, maximum: 100000 }
+        unitPrice: { type: number, minimum: 0, maximum: 10000000 }
+    InvoiceInput:
+      type: object
+      required: [customerId, items, dueDate, discount, notes, paymentTerms, status]
+      properties:
+        customerId: { type: string }
+        items: { type: array, minItems: 1, maxItems: 100, items: { $ref: "#/components/schemas/InvoiceLineInput" } }
+        dueDate: { type: string, pattern: "^\\d{4}-\\d{2}-\\d{2}$" }
+        discount: { type: number, minimum: 0 }
+        notes: { type: string, maxLength: 5000 }
+        paymentTerms: { type: string, maxLength: 3000 }
+        status: { type: string, enum: [draft, pending] }
+    InvoiceStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [draft, pending, paid, cancelled] }
+    Invoice:
+      type: object
+      required: [id, number, customerId, customer, items, subtotal, discount, total, dueDate, status, notes, paymentTerms, createdAt]
+      properties:
+        id: { type: string }
+        number: { type: string }
+        customerId: { type: string }
+        customer: { $ref: "#/components/schemas/Customer" }
+        items: { type: array, items: { $ref: "#/components/schemas/InvoiceLineInput" } }
+        subtotal: { type: number }
+        discount: { type: number }
+        total: { type: number }
+        dueDate: { type: string }
+        status: { type: string, enum: [draft, pending, paid, cancelled] }
+        notes: { type: string }
+        paymentTerms: { type: string }
+        createdAt: { type: string }
+        paidAt: { type: ["string", "null"] }
+        hoursTotal: { type: number, description: Hours snapshotted at invoice creation }
+    RecordKind:
+      type: string
+      enum: [leads, projects, transactions, appointments, agents, tracking, hours]
+    RecordInput:
+      type: object
+      required: [title, status, description, responsible, customerId, value, date, endDate, priority, tags, metadata]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        status: { type: string, maxLength: 80 }
+        description: { type: string, maxLength: 5000 }
+        responsible: { type: string, maxLength: 200 }
+        customerId: { type: string }
+        value: { type: number, minimum: 0, maximum: 100000000 }
+        date: { type: string, maxLength: 50 }
+        endDate: { type: string, maxLength: 50 }
+        priority: { type: string, enum: [low, medium, high] }
+        tags: { type: array, items: { type: string } }
+        metadata: { type: object, additionalProperties: true }
+    ModuleRecord:
+      allOf:
+        - { $ref: "#/components/schemas/RecordInput" }
+        - type: object
+          required: [id, kind, createdAt]
+          properties:
+            id: { type: string }
+            kind: { $ref: "#/components/schemas/RecordKind" }
+            createdAt: { type: string }
+    Activity:
+      type: object
+      required: [id, title, description, createdAt, entityType, entityId]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        createdAt: { type: string }
+        entityType: { type: string }
+        entityId: { type: string }
+    Overview:
+      type: object
+      required: [customers, activeProjects, revenue, receivable, expenses, appointments, products, invoices, conversion, series, invoiceCounts, hoursSold, hoursUsed, periodDays]
+      properties:
+        customers: { type: integer }
+        activeProjects: { type: integer }
+        revenue: { type: number }
+        receivable: { type: number }
+        expenses: { type: number }
+        appointments: { type: integer }
+        products: { type: integer }
+        invoices: { type: integer }
+        conversion: { type: number }
+        hoursSold: { type: number }
+        hoursUsed: { type: number }
+        periodDays: { type: integer }
+        invoiceCounts:
+          type: object
+          required: [draft, pending, paid, cancelled, overdue]
+          properties:
+            draft: { type: integer }
+            pending: { type: integer }
+            paid: { type: integer }
+            cancelled: { type: integer }
+            overdue: { type: integer }
+        series:
+          type: array
+          items: { $ref: "#/components/schemas/RevenuePoint" }
+    RevenuePoint:
+      type: object
+      required: [date, revenue, expenses]
+      properties:
+        date: { type: string }
+        revenue: { type: number }
+        expenses: { type: number }
+    Checkout:
+      type: object
+      required: [product, paymentConnected, sellerName, message]
+      properties:
+        product: { $ref: "#/components/schemas/Product" }
+        paymentConnected: { type: boolean }
+        sellerName: { type: string }
+        message: { type: string }
+    CheckoutInput:
+      type: object
+      required: [name, email, document, quantity, acceptedTerms]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 200 }
+        email: { type: string, format: email, maxLength: 250 }
+        document: { type: string, maxLength: 60 }
+        quantity: { type: integer, minimum: 1, maximum: 100 }
+        acceptedTerms: { type: boolean, enum: [true] }
+    PurchaseRequest:
+      type: object
+      required: [id, status, message, total]
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [awaiting_contact] }
+        message: { type: string }
+        total: { type: number }

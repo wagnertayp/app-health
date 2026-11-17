@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Healthfy Admin"
+description = "Painel Healthfy para gestão de clientes, produtos, banco de horas, invoices e checkouts personalizados, com módulos operacionais integrados."
+version = "1.0.0"
+id = "artifacts/healthfy-admin"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24026
+
+[services.development]
+run = "pnpm --filter @workspace/healthfy-admin run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/healthfy-admin", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/healthfy-admin/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24026"
+BASE_PATH = "/"
