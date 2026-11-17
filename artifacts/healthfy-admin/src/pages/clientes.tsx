@@ -124,7 +124,7 @@ export default function Clientes() {
   const projects = useRecords("projects");
   const rows = useMemo(() => (customers.data ?? []).filter((c) => st === "all" || c.status === st).filter((c) => !q || `${c.name} ${c.email} ${c.document} ${c.responsible}`.toLowerCase().includes(q.toLowerCase())), [customers.data, q, st]);
   return (
-    <div>
+    <div className={mode === "folders" ? "clients-floating-view" : "clients-list-view"}>
       <PageHeader title="Clientes" actions={<Button onClick={() => { setEdit(null); setOpen(true); }} data-testid="button-new-customer"><Plus className="mr-1.5 h-4 w-4" />Novo cliente</Button>} />
       <Panel title={<Segmented testId="filter-status" value={st} onChange={setSt} options={[{ value: "all", label: "Todos" }, { value: "active", label: "Ativos" }, { value: "prospect", label: "Prospectos" }, { value: "inactive", label: "Inativos" }]} />} actions={<div className="flex items-center gap-2"><div className="hidden sm:block"><SearchBox value={q} onChange={setQ} /></div><div className="flex rounded-lg border bg-muted/40 p-0.5" role="group" aria-label="Visualização">
           <button type="button" aria-pressed={mode === "folders"} onClick={() => setMode("folders")} className={`flex h-9 w-10 items-center justify-center rounded-md ${mode === "folders" ? "bg-card shadow-sm" : "text-muted-foreground"}`} aria-label="Pastas" data-testid="button-view-folders"><FolderOpen className="h-4 w-4" /></button>
@@ -134,7 +134,7 @@ export default function Clientes() {
         {customers.isLoading ? <LoadingRows /> : customers.isError ? <ErrorState error={customers.error} onRetry={() => customers.refetch()} /> : rows.length === 0 ? (
           <EmptyState icon={Contact} title={customers.data?.length ? "Nenhum resultado" : "Nenhum cliente cadastrado"} body="Clientes ficam disponíveis para invoices, projetos e horas." action={<Button size="sm" onClick={() => { setEdit(null); setOpen(true); }}>Cadastrar cliente</Button>} />
         ) : mode === "folders" ? (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-6 pt-2 sm:grid-cols-2 xl:grid-cols-3" data-testid="grid-customers">
+          <div className="grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 2xl:grid-cols-3" data-testid="grid-customers">
             {rows.map((c, i) => {
               const mp = (projects.data ?? []).filter((p) => p.customerId === c.id);
               const mi = (invoices.data ?? []).filter((x) => x.customerId === c.id);
@@ -175,7 +175,7 @@ export default function Clientes() {
             <thead className="border-b bg-muted/40"><tr><Th>Cliente</Th><Th>Contato</Th><Th>Responsável</Th><Th>Situação</Th><Th className="text-right">Ações</Th></tr></thead>
             <tbody>{rows.map((c) => (
               <tr key={c.id} className="cursor-pointer border-b last:border-0 hover:bg-muted/40" onClick={() => setView(c)} data-testid={`row-customer-${c.id}`}>
-                <Td><div className="flex items-center gap-2.5"><CustomerLogo name={c.name} path={c.logoPath} className="h-10 w-10 rounded-lg" textClass="text-xs" /><div><div className="font-medium">{c.name}</div><div className="text-xs text-muted-foreground">{c.document}</div></div></div></Td>
+                <Td><div className="flex items-center gap-3.5"><CustomerLogo name={c.name} path={c.logoPath} className="h-14 w-14 rounded-xl" textClass="text-base" /><div><div className="text-base font-semibold">{c.name}</div><div className="font-description mt-1 text-sm text-muted-foreground">{c.document}</div></div></div></Td>
                 <Td><div>{c.email || "—"}</div><div className="text-xs text-muted-foreground">{c.phone}</div></Td>
                 <Td>{c.responsible || "—"}</Td>
                 <Td><Pill tone={customerStatusTone[c.status]}>{customerStatusLabel[c.status]}</Pill></Td>

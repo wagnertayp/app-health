@@ -50,7 +50,7 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 
 - Follow the supplied Healthfy brief: dark collapsible sidebar, predominantly white content, restrained Shopify-inspired professional presentation.
 - Use the supplied Stage Grotesk family for interface typography and Arial for descriptions. Avoid subtitles; keep necessary form guidance and operational warnings.
-- Clientes should use the supplied interactive glass-folder pattern, with the client's/company's name and uploaded logo highly visible. Preserve projects, invoices and customer actions.
+- Clientes should use the supplied interactive glass-folder pattern, with the client's/company's name and uploaded logo highly visible. Folders should float directly over the page without a surrounding panel, with space for their shadows and opening animation; list mode should use larger rows, logos and names. Preserve projects, invoices and customer actions.
 - Multi Agenda should remain a light calendar with large day cells, names and photo avatars for every participant, visible labels, and combinable filters.
 - Keep Projetos nested inside Clientes, never a standalone top-level sidebar module.
 - Do not present fictitious operational data as real or include decorative nonfunctional actions.

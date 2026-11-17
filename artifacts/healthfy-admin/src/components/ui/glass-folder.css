@@ -1,3 +1,41 @@
+.clients-floating-view > .card-surface {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.clients-floating-view > .card-surface > header {
+  border-bottom: 0;
+  padding-inline: 0;
+  flex-wrap: wrap;
+}
+.clients-floating-view > .card-surface > div {
+  padding: 0;
+}
+.gf-cell {
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0 36px 40px;
+}
+.clients-list-view table th {
+  padding-block: 14px;
+  font-size: 12px;
+}
+.clients-list-view table td {
+  padding-block: 20px;
+  font-size: 15px;
+}
+.clients-list-view table td button {
+  width: 40px;
+  height: 40px;
+}
+.clients-list-view table td button svg {
+  width: 16px;
+  height: 16px;
+}
 .gf-root {
   --gf-px: 0;
   --gf-py: 0;

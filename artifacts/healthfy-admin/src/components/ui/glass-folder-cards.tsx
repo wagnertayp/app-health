@@ -46,7 +46,7 @@ export type GlassFolderProps = {
 
 const W = 340
 const H = 272
-const HEADROOM = 54
+const HEADROOM = 110
 const FRONT_TOP = 74
 const FRONT_H = H - FRONT_TOP
 
@@ -306,5 +306,5 @@ export function FluidGlassFolder(props: Omit<GlassFolderProps, "width">) {
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  return <div ref={ref} style={{ width: "100%" }}>{w > 0 ? <GlassFolder {...props} width={Math.min(w, 420)} /> : <div style={{ aspectRatio: "340 / 326" }} />}</div>
+  return <div ref={ref} className="gf-cell">{w > 0 ? <GlassFolder {...props} width={Math.min(w, 420)} /> : <div style={{ width: "100%", aspectRatio: "340 / 382" }} />}</div>
 }
