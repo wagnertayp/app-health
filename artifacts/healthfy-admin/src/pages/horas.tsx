@@ -5,6 +5,7 @@ import { useGetOverview, getGetOverviewQueryKey, useListCustomers, useListInvoic
 import { Button } from "@/components/ui/button";
 import { Confirm, EmptyState, ErrorState, LoadingRows, PageHeader, Panel, Stat, TableWrap, Td, Th } from "@/components/kit";
 import { RecordDialog, useRecordActions, useRecords, type FieldDef } from "@/components/records";
+import { HoursLogDialog } from "@/components/hours/hours-log-dialog";
 import { fmtDate, localISO, num, usePageMeta } from "@/lib/format";
 
 const fields: FieldDef[] = [
@@ -37,11 +38,13 @@ export default function Horas() {
     for (const h of hours.data ?? []) { const k = h.customerId || "_"; m[k] ??= { sold: 0, used: 0 }; m[k].used += h.value; }
     return Object.entries(m);
   }, [invoices.data, hours.data]);
+  const balanceByCustomer = useMemo(() => Object.fromEntries(balances), [balances]);
   const cname = (id: string) => (id === "_" ? "Sem cliente" : customers.data?.find((c) => c.id === id)?.name ?? "Cliente removido");
   const o = ov.data;
   return (
     <div className="space-y-6">
       <PageHeader eyebrow="Financeiro" title="Horas" subtitle="Horas vendidas vêm de invoices pagas com pacotes de horas. Consumos são registrados aqui." actions={<Button onClick={() => { setEdit(null); setOpen(true); }} data-testid="button-new-hours"><Plus className="mr-1.5 h-4 w-4" />Registrar consumo</Button>} />
+      <HoursLogDialog open={open && !edit} onOpenChange={setOpen} customers={customers.data ?? []} balances={balanceByCustomer} />
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Horas vendidas" value={o ? `${num(o.hoursSold)}h` : "—"} /><Stat label="Consumidas" value={o ? `${num(o.hoursUsed)}h` : "—"} /><Stat label="Saldo" value={o ? `${num(o.hoursSold - o.hoursUsed)}h` : "—"} />
       </div>
@@ -57,7 +60,7 @@ export default function Horas() {
       </Panel>
       <Panel title="Registros de consumo">
         {hours.isLoading ? <LoadingRows /> : hours.isError ? <ErrorState error={hours.error} onRetry={() => hours.refetch()} /> : !hours.data?.length ? (
-          <EmptyState icon={Timer} title="Nenhum consumo registrado" body="Registre as horas trabalhadas por cliente para acompanhar o saldo dos pacotes." action={<Button size="sm" onClick={() => setOpen(true)}>Registrar consumo</Button>} />
+          <EmptyState icon={Timer} title="Nenhum consumo registrado" body="Registre as horas trabalhadas por cliente para acompanhar o saldo dos pacotes." action={<Button size="sm" onClick={() => { setEdit(null); setOpen(true); }}>Registrar consumo</Button>} />
         ) : (
           <TableWrap>
             <thead className="border-b bg-muted/40"><tr><Th>Atividade</Th><Th>Cliente</Th><Th>Data</Th><Th>Por</Th><Th className="text-right">Horas</Th><Th className="text-right">Ações</Th></tr></thead>
@@ -70,7 +73,7 @@ export default function Horas() {
           </TableWrap>
         )}
       </Panel>
-      <RecordDialog kind="hours" open={open} onOpenChange={setOpen} record={edit} fields={fields} defaults={{ date: localISO(), value: 1 }} fixed={{ status: "registrado" }} title={edit ? "Editar consumo" : "Registrar consumo"} />
+      <RecordDialog kind="hours" open={open && !!edit} onOpenChange={(value) => { setOpen(value); if (!value) setEdit(null); }} record={edit} fields={fields} defaults={{ date: localISO(), value: 1 }} fixed={{ status: "registrado" }} title="Editar consumo" />
       <Confirm open={!!toDel} onOpenChange={(o) => !o && setToDel(null)} title="Excluir registro?" body="O saldo do cliente será recalculado." confirmLabel="Excluir" destructive onConfirm={() => toDel && remove(toDel.id, () => setToDel(null))} />
     </div>
   );
