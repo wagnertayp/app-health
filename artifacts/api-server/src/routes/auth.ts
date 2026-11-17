@@ -1,10 +1,13 @@
-import { GetCurrentAuthUserResponse } from "@workspace/api-zod";
+import { GetCurrentAuthUserResponse, LoginWithPasswordBody } from "@workspace/api-zod";
 import { db, usersTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 import { Router, type IRouter, type Request, type Response } from "express";
 import * as oidc from "openid-client";
-import { clearSession, createSession, getOidcConfig, getSessionId, SESSION_COOKIE, SESSION_TTL, isAllowedAdmin, type SessionData } from "../lib/auth";
+import { clearSession, createSession, getOidcConfig, getSessionId, SESSION_COOKIE, SESSION_TTL, isAllowedAdmin, isLocalAuth, verifyPassword, type SessionData } from "../lib/auth";
 
 const router: IRouter = Router();
+const loginAttempts = new Map<string, { count: number; until: number }>();
+const DUMMY_PASSWORD_HASH = `scrypt$${"00".repeat(16)}$${"00".repeat(64)}`;
 function getOrigin(req: Request): string {
   const host = String(req.headers["x-forwarded-host"] || req.headers.host || "").split(",")[0]!.trim();
   if (!/^[a-z0-9.-]+(?::\d+)?$/i.test(host)) throw new Error("Invalid host");
@@ -22,6 +25,7 @@ router.get("/auth/user", (req, res) => {
   res.json(GetCurrentAuthUserResponse.parse({ user: req.isAuthenticated() ? req.user : null }));
 });
 router.get("/login", async (req, res): Promise<void> => {
+  if (isLocalAuth()) { res.redirect(getSafeReturnTo(req.query.returnTo)); return; }
   const config = await getOidcConfig();
   const state = oidc.randomState();
   const nonce = oidc.randomNonce();
@@ -36,7 +40,42 @@ router.get("/login", async (req, res): Promise<void> => {
   }
   res.redirect(redirectTo.href);
 });
+router.post("/login", async (req, res): Promise<void> => {
+  if (!isLocalAuth()) { res.sendStatus(404); return; }
+  const parsed = LoginWithPasswordBody.safeParse(req.body);
+  if (!parsed.success) { res.status(400).json({ error: "Informe e-mail e senha." }); return; }
+  const email = parsed.data.email.trim().toLowerCase();
+  const key = `${req.ip || req.socket.remoteAddress || "unknown"}:${email}`;
+  const now = Date.now();
+  for (const [attemptKey, attempt] of loginAttempts) if (attempt.until <= now) loginAttempts.delete(attemptKey);
+  const previous = loginAttempts.get(key);
+  if (previous && previous.count >= 8) {
+    res.status(429).json({ error: "Muitas tentativas. Aguarde alguns minutos e tente novamente." });
+    return;
+  }
+  const [account] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+  const validPassword = await verifyPassword(parsed.data.password, account?.passwordHash || DUMMY_PASSWORD_HASH);
+  if (!account || !account.passwordHash || !validPassword || !isAllowedAdmin(account.email)) {
+    loginAttempts.set(key, { count: (previous?.count || 0) + 1, until: previous?.until || now + 15 * 60 * 1000 });
+    res.status(401).json({ error: "E-mail ou senha incorretos." });
+    return;
+  }
+  loginAttempts.delete(key);
+  const user = {
+    id: account.id,
+    email: account.email,
+    firstName: account.firstName,
+    lastName: account.lastName,
+    profileImageUrl: account.profileImageUrl,
+    isAdmin: true,
+  };
+  const session: SessionData = { user, access_token: "", emailVerified: true };
+  setCookie(res, SESSION_COOKIE, await createSession(session), SESSION_TTL);
+  res.setHeader("Cache-Control", "no-store");
+  res.json(GetCurrentAuthUserResponse.parse({ user }));
+});
 router.get("/callback", async (req, res): Promise<void> => {
+  if (isLocalAuth()) { res.redirect("/"); return; }
   const config = await getOidcConfig();
   const callbackUrl = `${getOrigin(req)}/api/callback`;
   const codeVerifier = req.cookies?.code_verifier;
@@ -76,11 +115,13 @@ router.get("/callback", async (req, res): Promise<void> => {
   res.redirect(returnTo);
 });
 router.get("/logout", async (req, res): Promise<void> => {
+  const returnTo = getSafeReturnTo(req.query.returnTo);
   await clearSession(res, getSessionId(req));
+  if (isLocalAuth()) { res.redirect(returnTo); return; }
   const config = await getOidcConfig();
   res.redirect(oidc.buildEndSessionUrl(config, {
     client_id: process.env.REPL_ID!,
-    post_logout_redirect_uri: new URL(getSafeReturnTo(req.query.returnTo), `${getOrigin(req)}/`).href,
+    post_logout_redirect_uri: new URL(returnTo, `${getOrigin(req)}/`).href,
   }).href);
 });
 export default router;

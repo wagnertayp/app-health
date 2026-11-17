@@ -8,6 +8,27 @@ import * as client from "openid-client";
 export const ISSUER_URL = process.env.ISSUER_URL ?? "https://replit.com/oidc";
 export const SESSION_COOKIE = "sid";
 export const SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
+export const AUTH_DRIVER = process.env.AUTH_DRIVER ?? "replit";
+if (AUTH_DRIVER !== "replit" && AUTH_DRIVER !== "local") throw new Error("AUTH_DRIVER deve ser 'replit' ou 'local'.");
+export const isLocalAuth = () => AUTH_DRIVER === "local";
+
+function derivePassword(password: string, salt: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    crypto.scrypt(password, salt, 64, (error, key) => {
+      if (error) reject(error);
+      else resolve(key);
+    });
+  });
+}
+
+export async function verifyPassword(password: string, encoded: string): Promise<boolean> {
+  const [scheme, saltHex, keyHex] = encoded.split("$");
+  if (scheme !== "scrypt" || !/^[0-9a-f]{32}$/i.test(saltHex || "") || !/^[0-9a-f]{128}$/i.test(keyHex || "")) return false;
+  const expected = Buffer.from(keyHex, "hex");
+  const actual = await derivePassword(password, Buffer.from(saltHex, "hex"));
+  return crypto.timingSafeEqual(actual, expected);
+}
+
 export interface SessionData {
   user: AuthUser;
   access_token: string;

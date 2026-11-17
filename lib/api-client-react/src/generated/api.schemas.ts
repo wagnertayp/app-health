@@ -122,6 +122,16 @@ export interface CustomerAttachmentUpload {
   attachment: CustomerAttachment;
 }
 
+export interface LocalLoginInput {
+  /** @maxLength 254 */
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 1024
+     */
+  password: string;
+}
+
 export interface AuthUser {
   id: string;
   /** @nullable */

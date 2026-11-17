@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@workspace/replit-auth-web";
 import { LogIn, LogOut, ShieldX } from "lucide-react";
@@ -25,6 +25,11 @@ function Frame({ children }: { children: ReactNode }) {
 export function AuthGate({ children }: { children: ReactNode }) {
   const { user, isLoading, isAuthenticated, login, logout } = useAuth();
   const qc = useQueryClient();
+  const localAuth = import.meta.env.VITE_AUTH_MODE === "local";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const lastId = useRef<string | null | undefined>(undefined);
   const uid = isAuthenticated ? (user?.id ?? null) : null;
 
@@ -35,6 +40,30 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }, [uid, isLoading, qc]);
 
   const signOut = () => { qc.clear(); logout(); };
+  const submitLocalLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoginError("");
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => null) as { error?: string } | null;
+        setLoginError(result?.error || "Não foi possível entrar. Confira seus dados e tente novamente.");
+        return;
+      }
+      qc.clear();
+      window.location.reload();
+    } catch {
+      setLoginError("Não foi possível conectar ao servidor. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -48,9 +77,40 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return (
       <Frame>
         <h1 className="mt-8 text-3xl font-semibold tracking-tight" data-testid="text-login-title">Healthfy Admin</h1>
-        <Button onClick={login} className="mt-8 h-11 w-full bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" data-testid="button-login">
-          <LogIn className="mr-2 h-4 w-4" />Entrar
-        </Button>
+        {localAuth ? (
+          <form onSubmit={submitLocalLogin} className="mt-8 space-y-4">
+            <label className="block space-y-2 text-sm font-medium">
+              <span>E-mail</span>
+              <input
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={event => setEmail(event.target.value)}
+                className="h-11 w-full rounded-lg border border-sidebar-border bg-black/10 px-3 text-sm outline-none focus:ring-2 focus:ring-sidebar-primary"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium">
+              <span>Senha</span>
+              <input
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={event => setPassword(event.target.value)}
+                className="h-11 w-full rounded-lg border border-sidebar-border bg-black/10 px-3 text-sm outline-none focus:ring-2 focus:ring-sidebar-primary"
+              />
+            </label>
+            {loginError && <p role="alert" className="text-sm text-[hsl(12_72%_66%)]">{loginError}</p>}
+            <Button type="submit" disabled={isSubmitting} className="h-11 w-full bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" data-testid="button-login">
+              <LogIn className="mr-2 h-4 w-4" />{isSubmitting ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
+        ) : (
+          <Button onClick={login} className="mt-8 h-11 w-full bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" data-testid="button-login">
+            <LogIn className="mr-2 h-4 w-4" />Entrar
+          </Button>
+        )}
       </Frame>
     );
   }

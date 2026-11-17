@@ -1,7 +1,7 @@
 import type { AuthUser } from "@workspace/api-zod";
 import type { NextFunction, Request, Response } from "express";
 import * as oidc from "openid-client";
-import { clearSession, getOidcConfig, getSession, getSessionId, isAllowedAdmin, updateSession, type SessionData } from "../lib/auth";
+import { clearSession, getOidcConfig, getSession, getSessionId, isAllowedAdmin, isLocalAuth, updateSession, type SessionData } from "../lib/auth";
 
 declare global {
   namespace Express {
@@ -32,7 +32,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
   if (!sid) { next(); return; }
   const session = await getSession(sid);
   if (!session?.user?.id) { await clearSession(res, sid); next(); return; }
-  const refreshed = await refreshIfExpired(sid, session);
+  const refreshed = isLocalAuth() ? session : await refreshIfExpired(sid, session);
   if (!refreshed) { await clearSession(res, sid); next(); return; }
   req.user = { ...refreshed.user, isAdmin: refreshed.emailVerified !== false && isAllowedAdmin(refreshed.user.email) };
   next();

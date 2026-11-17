@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { Readable } from "stream";
 import { File, Storage } from "@google-cloud/storage";
 import { canAccessObject, getObjectAclPolicy, type ObjectAclPolicy, ObjectPermission, setObjectAclPolicy } from "./objectAcl";
+import { isLocalObjectStorage } from "./local-storage";
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 export const objectStorageClient = new Storage({
@@ -37,6 +38,7 @@ export class ObjectStorageService {
     return dir;
   }
   async searchPublicObject(filePath: string): Promise<File | null> {
+    if (isLocalObjectStorage()) return null;
     for (const searchPath of this.getPublicObjectSearchPaths()) {
       const { bucketName, objectName } = parseObjectPath(`${searchPath}/${filePath}`);
       const file = objectStorageClient.bucket(bucketName).file(objectName);
@@ -58,6 +60,7 @@ export class ObjectStorageService {
     return new Response(webStream, { headers });
   }
   async getObjectEntityUploadURL(): Promise<string> {
+    if (isLocalObjectStorage()) return `/api/storage/uploads/${randomUUID()}`;
     const { bucketName, objectName } = parseObjectPath(`${this.getPrivateObjectDir()}/uploads/${randomUUID()}`);
     return signObjectURL({ bucketName, objectName, method: "PUT", ttlSec: 900 });
   }
@@ -75,6 +78,10 @@ export class ObjectStorageService {
     return file;
   }
   normalizeObjectEntityPath(rawPath: string): string {
+    if (isLocalObjectStorage()) {
+      const match = /^\/api\/storage\/uploads\/([0-9a-f-]{36})$/i.exec(rawPath);
+      return match ? `/objects/uploads/${match[1]}` : rawPath;
+    }
     if (!rawPath.startsWith("https://storage.googleapis.com/")) return rawPath;
     const rawObjectPath = new URL(rawPath).pathname;
     let entityDir = this.getPrivateObjectDir();
@@ -85,6 +92,7 @@ export class ObjectStorageService {
   async trySetObjectEntityAclPolicy(rawPath: string, policy: ObjectAclPolicy): Promise<string> {
     const normalized = this.normalizeObjectEntityPath(rawPath);
     if (!normalized.startsWith("/")) return normalized;
+    if (isLocalObjectStorage()) return normalized;
     await setObjectAclPolicy(await this.getObjectEntityFile(normalized), policy);
     return normalized;
   }

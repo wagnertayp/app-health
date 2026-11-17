@@ -1,6 +1,7 @@
 import { logoStorage, validLogoPath } from "./customer-logos";
 import { find, list, replace, type Entity } from "./healthfy-store";
 import { MAX_ATTACHMENT_SIZE, matchesAttachmentType } from "./customer-attachment-types";
+import { createLocalObjectReadStream, getLocalObjectMetadata, isLocalObjectStorage, readLocalObjectBytes } from "./local-storage";
 
 export interface AttachmentUpload extends Entity {
   customerId: string;
@@ -20,6 +21,22 @@ export function attachmentInfo(upload: AttachmentUpload) {
 
 export async function inspectAttachment(upload: AttachmentUpload) {
   if (!validLogoPath(upload.objectPath)) throw new Error("Caminho de anexo inválido.");
+  if (isLocalObjectStorage()) {
+    const metadata = await getLocalObjectMetadata(upload.objectPath);
+    const size = metadata.size;
+    if (!size || size > MAX_ATTACHMENT_SIZE || size !== upload.size
+      || (upload.generation && upload.generation !== metadata.generation)) {
+      throw new Error("O arquivo enviado difere do selecionado. Envie-o novamente.");
+    }
+    const bytes = await readLocalObjectBytes(upload.objectPath, 0, Math.min(size - 1, 8191));
+    if (!matchesAttachmentType(bytes, upload.contentType)) {
+      throw new Error("O conteúdo do arquivo não corresponde ao formato informado.");
+    }
+    return {
+      file: { createReadStream: (range?: { start: number; end: number }) => createLocalObjectReadStream(upload.objectPath, range) },
+      generation: metadata.generation,
+    };
+  }
   const file = await logoStorage.getObjectEntityFile(upload.objectPath);
   const [metadata] = await file.getMetadata();
   const size = Number(metadata.size);

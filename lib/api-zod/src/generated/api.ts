@@ -287,6 +287,29 @@ export const BeginBrowserLoginQueryParams = zod.object({
 export const BeginBrowserLoginResponse = zod.void()
 
 
+export const loginWithPasswordBodyEmailMax = 254;
+
+export const loginWithPasswordBodyPasswordMax = 1024;
+
+
+
+export const LoginWithPasswordBody = zod.object({
+  "email": zod.string().email().max(loginWithPasswordBodyEmailMax),
+  "password": zod.string().min(1).max(loginWithPasswordBodyPasswordMax)
+})
+
+export const LoginWithPasswordResponse = zod.object({
+  "user": zod.union([zod.object({
+  "id": zod.string(),
+  "email": zod.string().nullable(),
+  "firstName": zod.string().nullable(),
+  "lastName": zod.string().nullable(),
+  "profileImageUrl": zod.string().nullable(),
+  "isAdmin": zod.boolean().optional()
+}),zod.null()])
+})
+
+
 export const HandleBrowserLoginCallbackResponse = zod.void()
 
 
@@ -320,6 +343,13 @@ export const RequestUploadUrlResponse = zod.object({
   "contentType": zod.enum(['image/png', 'image/jpeg', 'image/webp'])
 }).optional()
 })
+
+
+export const UploadLocalObjectParams = zod.object({
+  "uploadId": zod.coerce.string().uuid()
+})
+
+export const UploadLocalObjectResponse = zod.void()
 
 
 export const GetPublicObjectParams = zod.object({

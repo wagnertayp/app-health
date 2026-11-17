@@ -40,6 +40,7 @@ import type {
   InvoiceInput,
   InvoiceStatusInput,
   InvoiceUpdate,
+  LocalLoginInput,
   ModuleRecord,
   Overview,
   Product,
@@ -912,6 +913,88 @@ export function useBeginBrowserLogin<TData = Awaited<ReturnType<typeof beginBrow
 
 
 
+export const getLoginWithPasswordUrl = () => {
+
+
+
+
+  return `/api/login`
+}
+
+export const loginWithPassword = async (localLoginInput: LocalLoginInput, options?: Parameters<typeof customFetch>[1]): Promise<AuthUserEnvelope> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AuthUserEnvelope>(getLoginWithPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(localLoginInput)
+  }
+);}
+
+
+
+
+
+export const getLoginWithPasswordMutationKey = () => ['loginWithPassword'] as const;
+
+export const getLoginWithPasswordMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginWithPassword>>, TError,LoginWithPasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginWithPassword>>, TError,LoginWithPasswordMutationVariables, TContext> => {
+
+const mutationKey = getLoginWithPasswordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginWithPassword>>, LoginWithPasswordMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginWithPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginWithPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof loginWithPassword>>>
+    export type LoginWithPasswordMutationBody = BodyType<LocalLoginInput>
+    export type LoginWithPasswordMutationError = ErrorType<void>
+    export type LoginWithPasswordMutationVariables = {data: BodyType<LocalLoginInput>}
+
+    export const useLoginWithPassword = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginWithPassword>>, TError,LoginWithPasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof loginWithPassword>>,
+        TError,
+        LoginWithPasswordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getLoginWithPasswordMutationOptions(options), queryClient);
+    }
+
 export const getHandleBrowserLoginCallbackUrl = () => {
 
 
@@ -1182,6 +1265,89 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getRequestUploadUrlMutationOptions(options), queryClient);
+    }
+
+export const getUploadLocalObjectUrl = (uploadId: string,) => {
+
+
+
+
+  return `/api/storage/uploads/${uploadId}`
+}
+
+export const uploadLocalObject = async (uploadId: string,
+    uploadLocalObjectBody: Blob, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<void>(getUploadLocalObjectUrl(uploadId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/octet-stream', ...getHeaders(options?.headers) },
+    body: uploadLocalObjectBody
+  }
+);}
+
+
+
+
+
+export const getUploadLocalObjectMutationKey = () => ['uploadLocalObject'] as const;
+
+export const getUploadLocalObjectMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadLocalObject>>, TError,UploadLocalObjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadLocalObject>>, TError,UploadLocalObjectMutationVariables, TContext> => {
+
+const mutationKey = getUploadLocalObjectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadLocalObject>>, UploadLocalObjectMutationVariables> = (props) => {
+          const {uploadId,data} = props ?? {};
+
+          return  uploadLocalObject(uploadId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadLocalObjectMutationResult = NonNullable<Awaited<ReturnType<typeof uploadLocalObject>>>
+    export type UploadLocalObjectMutationBody = BodyType<Blob>
+    export type UploadLocalObjectMutationError = ErrorType<void>
+    export type UploadLocalObjectMutationVariables = {uploadId: string;data: BodyType<Blob>}
+
+    export const useUploadLocalObject = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadLocalObject>>, TError,UploadLocalObjectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadLocalObject>>,
+        TError,
+        UploadLocalObjectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUploadLocalObjectMutationOptions(options), queryClient);
     }
 
 export const getGetPublicObjectUrl = (filePath: string,) => {

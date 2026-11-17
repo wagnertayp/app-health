@@ -110,6 +110,21 @@ paths:
         - { name: returnTo, in: query, schema: { type: string } }
       responses:
         "302": { description: Redirect to identity provider }
+    post:
+      operationId: loginWithPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LocalLoginInput" }
+      responses:
+        "200":
+          description: Authenticated local account
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthUserEnvelope" }
+        "401": { description: Email or password is incorrect }
+        "429": { description: Too many login attempts }
   /callback:
     get:
       operationId: handleBrowserLoginCallback
@@ -134,6 +149,21 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/UploadUrlResponse" }
+  /storage/uploads/{uploadId}:
+    parameters:
+      - { name: uploadId, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: uploadLocalObject
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary, maxLength: 52428800 }
+      responses:
+        "204": { description: Private file stored on the server }
+        "400": { description: Invalid or incomplete file }
+        "403": { description: Upload does not belong to the signed-in user }
+        "404": { description: Upload not found or local storage is disabled }
   /storage/public-objects/{filePath}:
     get:
       operationId: getPublicObject
@@ -428,6 +458,12 @@ components:
       properties:
         uploadURL: { type: string }
         attachment: { $ref: "#/components/schemas/CustomerAttachment" }
+    LocalLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 1, maxLength: 1024 }
     AuthUser:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]

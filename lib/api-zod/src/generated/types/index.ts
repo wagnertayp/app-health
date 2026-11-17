@@ -32,6 +32,7 @@ export * from './invoiceStatus';
 export * from './invoiceStatusInput';
 export * from './invoiceStatusInputStatus';
 export * from './invoiceUpdate';
+export * from './localLoginInput';
 export * from './moduleRecord';
 export * from './overview';
 export * from './overviewInvoiceCounts';
