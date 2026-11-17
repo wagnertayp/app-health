@@ -21,7 +21,7 @@ export function CalendarGrid({ days, mode, cursor, list, customers, actions, onA
   const cols = mode === "day" ? 1 : 7;
   return (
     <div className="w-full min-w-0 overflow-x-auto rounded-2xl border bg-[hsl(220_20%_92%)] shadow-[0_1px_2px_hsl(222_30%_20%/0.05)]" data-testid="calendar-scroll">
-      <div className={cn("grid gap-px", mode === "day" ? "min-w-0" : "min-w-[1400px]")} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+      <div className={cn("grid gap-px", mode === "day" ? "min-w-0" : "min-w-[1120px]")} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {mode === "month" && WEEK.map((w, i) => (
           <div key={w} className={cn("bg-[hsl(40_20%_97%)] px-3 py-2.5 text-[12px] font-bold uppercase tracking-[0.08em]", i >= 5 ? "text-[hsl(12_60%_45%)]" : "text-foreground/60")}>{w}</div>
         ))}

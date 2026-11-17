@@ -67,17 +67,20 @@ export default function Agenda() {
         <Segmented testId="toggle-mode" value={mode} onChange={setMode} options={[{ value: "day", label: "Dia" }, { value: "week", label: "Semana" }, { value: "month", label: "Mês" }]} />
       </div>
 
-      <AgendaFilterBar f={filters} set={(p) => setFilters((s) => ({ ...s, ...p }))} options={options} customers={customers} matchCount={matchCount} />
-
-      {appts.isLoading ? (
-        <div className="grid grid-cols-7 gap-px overflow-hidden rounded-2xl border bg-border" data-testid="calendar-loading">
-          {Array.from({ length: 14 }, (_, i) => <div key={i} className="space-y-2 bg-card p-3"><Skeleton className="h-6 w-10" /><Skeleton className="h-16 w-full" /></div>)}
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[248px_minmax(0,1fr)] xl:grid-cols-[272px_minmax(0,1fr)]">
+        <AgendaFilterBar f={filters} set={(p) => setFilters((s) => ({ ...s, ...p }))} options={options} customers={customers} matchCount={matchCount} />
+        <div className="min-w-0">
+          {appts.isLoading ? (
+            <div className="grid min-w-[1000px] grid-cols-7 gap-px overflow-hidden rounded-2xl border bg-border" data-testid="calendar-loading">
+              {Array.from({ length: 14 }, (_, i) => <div key={i} className="space-y-2 bg-card p-3"><Skeleton className="h-6 w-10" /><Skeleton className="h-16 w-full" /></div>)}
+            </div>
+          ) : appts.isError ? (
+            <ErrorState error={appts.error} onRetry={() => appts.refetch()} />
+          ) : (
+            <CalendarGrid days={days} mode={mode} cursor={cursor} list={filtered} customers={custMap} actions={actions} onAdd={openNew} onShowDay={setDetailDay} />
+          )}
         </div>
-      ) : appts.isError ? (
-        <ErrorState error={appts.error} onRetry={() => appts.refetch()} />
-      ) : (
-        <CalendarGrid days={days} mode={mode} cursor={cursor} list={filtered} customers={custMap} actions={actions} onAdd={openNew} onShowDay={setDetailDay} />
-      )}
+      </div>
 
       <Dialog open={!!detailDay} onOpenChange={(o) => !o && setDetailDay(null)}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">

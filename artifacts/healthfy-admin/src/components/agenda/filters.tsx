@@ -9,7 +9,7 @@ function Multi({ label, options, value, onChange, testId }: { label: string; opt
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" data-testid={testId} className={cn("inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-colors", value.length ? "border-[hsl(var(--chart-1))] bg-accent text-accent-foreground" : "bg-card hover:bg-muted")}>
+        <button type="button" data-testid={testId} className={cn("inline-flex h-10 w-full items-center justify-between gap-1.5 rounded-lg border px-3 text-left text-[13px] font-medium transition-colors", value.length ? "border-[hsl(var(--chart-1))] bg-accent text-accent-foreground" : "bg-card hover:bg-muted")}>
           {label}
           {value.length > 0 && <span className="num rounded-full bg-[hsl(var(--chart-1))] px-1.5 text-[11px] text-white">{value.length}</span>}
           <ChevronDown className="h-3.5 w-3.5 opacity-60" />
@@ -35,7 +35,7 @@ function Multi({ label, options, value, onChange, testId }: { label: string; opt
   );
 }
 
-const sel = (on: boolean) => cn("h-9 rounded-lg border px-2.5 text-[13px] font-medium outline-none focus:border-ring", on ? "border-[hsl(var(--chart-1))] bg-accent text-accent-foreground" : "bg-card");
+const sel = (on: boolean) => cn("field h-10 w-full text-[13px] font-medium outline-none focus:border-ring", on ? "border-[hsl(var(--chart-1))] bg-accent text-accent-foreground" : "bg-card");
 
 export function AgendaFilterBar({ f, set, options, customers, matchCount }: {
   f: AgendaFilters;
@@ -56,36 +56,52 @@ export function AgendaFilterBar({ f, set, options, customers, matchCount }: {
     ...(f.priority ? [{ k: "pr", label: `Prioridade ${priorityLabel[f.priority]}`, clear: () => set({ priority: "" }) }] : []),
   ];
   return (
-    <section className="mb-4 rounded-xl border bg-card p-3" data-testid="agenda-filters">
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input aria-label="Buscar compromissos" value={f.q} onChange={(e) => set({ q: e.target.value })} placeholder="Buscar título, pessoa, cliente, etiqueta, canal ou pauta" className="field h-9 pl-8" data-testid="filter-search" />
-        </label>
-        <Multi label="Pessoas" options={options.people} value={f.people} onChange={(people) => set({ people })} testId="filter-responsible" />
-        <select aria-label="Filtrar por cliente" value={f.customerId} onChange={(e) => set({ customerId: e.target.value })} className={sel(!!f.customerId)} data-testid="filter-customer">
-          <option value="">Todos os clientes</option>
-          {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        <Multi label="Status" options={options.statuses} value={f.statuses} onChange={(statuses) => set({ statuses })} testId="filter-status" />
-        <Multi label="Etiquetas" options={options.tags} value={f.tags} onChange={(tags) => set({ tags })} testId="filter-tags" />
-        <select aria-label="Filtrar por canal" value={f.channel} onChange={(e) => set({ channel: e.target.value })} className={sel(!!f.channel)} data-testid="filter-channel">
-          <option value="">Todos os canais</option>
-          {options.channels.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select aria-label="Filtrar por prioridade" value={f.priority} onChange={(e) => set({ priority: e.target.value })} className={sel(!!f.priority)} data-testid="filter-priority">
-          <option value="">Qualquer prioridade</option>
-          {(["high", "medium", "low"] as const).map((p) => <option key={p} value={p}>{priorityLabel[p]}</option>)}
-        </select>
-      </div>
-      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[12px]">
-        <span className="num mr-1 font-semibold" data-testid="text-match-count">{matchCount} {matchCount === 1 ? "compromisso" : "compromissos"} no período</span>
-        {chips.map((c) => (
-          <button key={c.k} type="button" onClick={c.clear} className="inline-flex items-center gap-1 rounded-full border border-[hsl(var(--chart-1))]/40 bg-accent px-2 py-0.5 font-medium text-accent-foreground hover:bg-accent/70">
-            {c.label}<X className="h-3 w-3" />
-          </button>
-        ))}
-        {n > 0 && <button type="button" onClick={() => set({ q: "", people: [], customerId: "", statuses: [], tags: [], channel: "", priority: "" })} className="ml-auto font-semibold text-destructive hover:underline" data-testid="button-clear-filters">Limpar filtros ({n})</button>}
+    <section className="rounded-xl border bg-card p-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto" data-testid="agenda-filters">
+      <div className="space-y-4">
+        <div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Buscar</div>
+          <label className="relative block">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input aria-label="Buscar compromissos" value={f.q} onChange={(e) => set({ q: e.target.value })} placeholder="Título, pessoa, cliente..." className="field h-10 pl-8" data-testid="filter-search" />
+          </label>
+        </div>
+        <div className="space-y-2 border-t pt-3">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Equipe e cliente</div>
+          <Multi label="Pessoas" options={options.people} value={f.people} onChange={(people) => set({ people })} testId="filter-responsible" />
+          <select aria-label="Filtrar por cliente" value={f.customerId} onChange={(e) => set({ customerId: e.target.value })} className={sel(!!f.customerId)} data-testid="filter-customer">
+            <option value="">Todos os clientes</option>
+            {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
+        <div className="space-y-2 border-t pt-3">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Compromisso</div>
+          <Multi label="Status" options={options.statuses} value={f.statuses} onChange={(statuses) => set({ statuses })} testId="filter-status" />
+          <select aria-label="Filtrar por prioridade" value={f.priority} onChange={(e) => set({ priority: e.target.value })} className={sel(!!f.priority)} data-testid="filter-priority">
+            <option value="">Qualquer prioridade</option>
+            {(["high", "medium", "low"] as const).map((p) => <option key={p} value={p}>{priorityLabel[p]}</option>)}
+          </select>
+        </div>
+        <div className="space-y-2 border-t pt-3">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Organização</div>
+          <Multi label="Etiquetas" options={options.tags} value={f.tags} onChange={(tags) => set({ tags })} testId="filter-tags" />
+          <select aria-label="Filtrar por canal" value={f.channel} onChange={(e) => set({ channel: e.target.value })} className={sel(!!f.channel)} data-testid="filter-channel">
+            <option value="">Todos os canais</option>
+            {options.channels.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="border-t pt-3 text-[12px]">
+          <span className="num font-semibold" data-testid="text-match-count">{matchCount} {matchCount === 1 ? "compromisso" : "compromissos"} no período</span>
+          {!!chips.length && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {chips.map((c) => (
+                <button key={c.k} type="button" onClick={c.clear} className="inline-flex items-center gap-1 rounded-full border border-[hsl(var(--chart-1))]/40 bg-accent px-2 py-1 font-medium text-accent-foreground hover:bg-accent/70">
+                  {c.label}<X className="h-3 w-3 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+          {n > 0 && <button type="button" onClick={() => set({ q: "", people: [], customerId: "", statuses: [], tags: [], channel: "", priority: "" })} className="mt-2 font-semibold text-destructive hover:underline" data-testid="button-clear-filters">Limpar filtros ({n})</button>}
+        </div>
       </div>
     </section>
   );
