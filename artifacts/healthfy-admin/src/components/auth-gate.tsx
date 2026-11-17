@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@workspace/replit-auth-web";
 import { LogIn, LogOut, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@assets/HEALTH_SEM_FUNDO_1794883543830.png";
+import logo from "../assets/healthfy-logo.png";
 
 type Session = { name: string; email: string; initials: string; signOut: () => void };
 const SessionCtx = createContext<Session | null>(null);

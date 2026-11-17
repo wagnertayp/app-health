@@ -25,7 +25,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/components/auth-gate";
-import logo from "@assets/HEALTH_SEM_FUNDO_1794883543830.png";
+import logo from "../assets/healthfy-logo.png";
 
 type Item = { label: string; href: string; icon: LucideIcon; match?: (p: string) => boolean; children?: Item[] };
 

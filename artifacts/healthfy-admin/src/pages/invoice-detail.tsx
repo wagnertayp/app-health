@@ -9,7 +9,7 @@ import { Confirm, ErrorState, LoadingRows, PageHeader, Pill } from "@/components
 import { useInvalidateAll } from "@/components/records";
 import { brl, errMsg, fmtDate, fmtDateTime, num, usePageMeta } from "@/lib/format";
 import { invoiceKey, invoiceStatusLabel, invoiceStatusTone } from "@/lib/status";
-import logo from "@assets/HEALTH_SEM_FUNDO_1794883543830.png";
+import logo from "../assets/healthfy-logo.png";
 
 const actionCopy: Record<InvoiceStatusInputStatus, { title: string; body: string; label: string }> = {
   pending: { title: "Emitir invoice?", body: "A invoice passa a pendente e entra no contas a receber.", label: "Emitir" },
