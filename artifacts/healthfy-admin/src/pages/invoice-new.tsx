@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { Plus, Trash2, UserPlus } from "lucide-react";
-import { useCreateInvoice, useListCustomers, useListProducts, type InvoiceLineInput } from "@workspace/api-client-react";
+import { useCreateInvoice, useGetInvoice, useListCustomers, useListProducts, useUpdateInvoice, type Invoice, type InvoiceLineInput } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Field, PageHeader, Panel } from "@/components/kit";
+import { ErrorState, Field, LoadingRows, PageHeader, Panel } from "@/components/kit";
 import { CustomerDialog } from "@/pages/clientes";
 import { useInvalidateAll } from "@/components/records";
 import { addDaysISO, brl, errMsg, getPrefs, usePageMeta } from "@/lib/format";
@@ -13,8 +13,8 @@ type Line = { key: number; productId: string; description: string; quantity: str
 let k = 1;
 const blank = (): Line => ({ key: k++, productId: "", description: "", quantity: "1", unitPrice: "0" });
 
-export default function InvoiceNew() {
-  usePageMeta("Nova invoice", "Emitir uma nova invoice Healthfy.");
+export default function InvoiceNew({ editMode = false, invoiceId = "" }: { editMode?: boolean; invoiceId?: string }) {
+  usePageMeta(editMode ? "Editar invoice" : "Nova invoice", editMode ? "Editar rascunho de invoice." : "Emitir uma nova invoice Healthfy.");
   const prefs = getPrefs();
   const search = new URLSearchParams(useSearch());
   const [, nav] = useLocation();
@@ -23,6 +23,8 @@ export default function InvoiceNew() {
   const customers = useListCustomers();
   const products = useListProducts();
   const create = useCreateInvoice();
+  const update = useUpdateInvoice();
+  const existing = useGetInvoice(invoiceId, { query: { enabled: editMode && !!invoiceId } });
   const [customerId, setCustomerId] = useState(search.get("customer") ?? "");
   const [lines, setLines] = useState<Line[]>([blank()]);
   const [dueDate, setDueDate] = useState(addDaysISO(prefs.dueDays));
@@ -32,8 +34,28 @@ export default function InvoiceNew() {
   const [err, setErr] = useState("");
   const [newCust, setNewCust] = useState(false);
   const seeded = useRef(false);
+  const editSeeded = useRef(false);
 
   useEffect(() => {
+    if (!editMode || !existing.data || editSeeded.current) return;
+    editSeeded.current = true;
+    const invoice = existing.data;
+    setCustomerId(invoice.customerId);
+    setLines(invoice.items.map((item) => ({
+      key: k++,
+      productId: item.productId ?? "",
+      description: item.description,
+      quantity: String(item.quantity),
+      unitPrice: String(item.unitPrice),
+    })));
+    setDueDate(invoice.dueDate);
+    setDiscount(String(invoice.discount));
+    setNotes(invoice.notes);
+    setTerms(invoice.paymentTerms);
+  }, [editMode, existing.data]);
+
+  useEffect(() => {
+    if (editMode) return;
     const pid = search.get("product");
     if (seeded.current || !pid || !products.data) return;
     const p = products.data.find((x) => x.id === pid);
@@ -42,7 +64,7 @@ export default function InvoiceNew() {
       setLines([{ key: k++, productId: p.id, description: p.name, quantity: "1", unitPrice: String(p.price) }]);
       if (p.paymentTerms) setTerms(p.paymentTerms);
     }
-  }, [products.data, search]);
+  }, [products.data, search, editMode]);
 
   const upd = (key: number, patch: Partial<Line>) => setLines((ls) => ls.map((l) => (l.key === key ? { ...l, ...patch } : l)));
   const pick = (key: number, pid: string) => {
@@ -64,22 +86,27 @@ export default function InvoiceNew() {
       items.push({ ...(l.productId ? { productId: l.productId } : {}), description: l.description.trim(), quantity: Number(l.quantity), unitPrice: Number(l.unitPrice) });
     }
     if (disc < 0 || disc > subtotal) return setErr("O desconto não pode exceder o subtotal.");
-    create.mutate(
-      { data: { customerId, items, dueDate, discount: disc, notes, paymentTerms: terms, status } },
-      {
-        onSuccess: (i) => {
-          inv();
-          toast({ title: `Invoice ${i.number} criada` });
-          nav(`/invoices/${i.id}`);
-        },
-        onError: (e) => setErr(errMsg(e)),
-      },
-    );
+    const data = { customerId, items, dueDate, discount: disc, notes, paymentTerms: terms };
+    const onSuccess = (i: Invoice) => {
+      inv();
+      toast({ title: editMode ? `Invoice ${i.number} atualizada` : `Invoice ${i.number} criada` });
+      nav(`/invoices/${i.id}`);
+    };
+    const onError = (e: unknown) => setErr(errMsg(e));
+    if (editMode) update.mutate({ id: invoiceId, data }, { onSuccess, onError });
+    else create.mutate({ data: { ...data, status } }, { onSuccess, onError });
   }
+
+  if (editMode && existing.isLoading) return <LoadingRows rows={6} />;
+  if (editMode && (existing.isError || !existing.data)) return <ErrorState error={existing.error} onRetry={() => existing.refetch()} />;
+  if (editMode && existing.data && existing.data.status !== "draft") {
+    return <ErrorState error={new Error("Somente rascunhos podem ser editados. Invoices emitidas preservam o histórico.")} onRetry={() => nav(`/invoices/${invoiceId}`)} />;
+  }
+  const saving = create.isPending || update.isPending;
 
   return (
     <div>
-      <PageHeader back={{ href: "/invoices", label: "Invoices" }} title="Nova invoice" subtitle="Escolha um produto para preencher a linha ou digite uma linha personalizada." />
+      <PageHeader back={{ href: editMode ? `/invoices/${invoiceId}` : "/invoices", label: editMode ? "Invoice" : "Invoices" }} title={editMode ? `Editar ${existing.data?.number ?? "invoice"}` : "Nova invoice"} subtitle={editMode ? "Altere os dados do rascunho. O número e a data de criação serão preservados." : "Escolha um produto para preencher a linha ou digite uma linha personalizada."} />
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <Panel title="Cliente">
@@ -129,8 +156,14 @@ export default function InvoiceNew() {
             </dl>
             {err && <p className="mt-3 rounded-md bg-[hsl(4_80%_96%)] px-3 py-2 text-xs font-medium text-destructive" data-testid="text-error">{err}</p>}
             <div className="mt-4 grid gap-2">
-              <Button disabled={create.isPending} onClick={() => submit("pending")} data-testid="button-issue">{create.isPending ? "Emitindo..." : "Emitir como pendente"}</Button>
-              <Button variant="outline" disabled={create.isPending} onClick={() => submit("draft")} data-testid="button-draft">Salvar rascunho</Button>
+              {editMode ? (
+                <Button disabled={saving} onClick={() => submit("draft")} data-testid="button-save-invoice">{saving ? "Salvando..." : "Salvar alterações"}</Button>
+              ) : (
+                <>
+                  <Button disabled={saving} onClick={() => submit("pending")} data-testid="button-issue">{saving ? "Emitindo..." : "Emitir como pendente"}</Button>
+                  <Button variant="outline" disabled={saving} onClick={() => submit("draft")} data-testid="button-draft">Salvar rascunho</Button>
+                </>
+              )}
               <Button variant="ghost" asChild><Link href="/invoices">Cancelar</Link></Button>
             </div>
           </Panel>

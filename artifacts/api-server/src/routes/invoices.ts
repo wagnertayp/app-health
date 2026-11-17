@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, healthfyEntities } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import {
-  CreateInvoiceBody, GetInvoiceResponse, ListInvoicesResponse, UpdateInvoiceStatusBody,
+  CreateInvoiceBody, GetInvoiceResponse, ListInvoicesResponse, UpdateInvoiceBody, UpdateInvoiceStatusBody,
   GetProductResponse, CreateCustomerResponse,
 } from "@workspace/api-zod";
 import { activity, find, insert, list, money, remove, replace, validDate } from "../lib/healthfy-store";
@@ -52,6 +52,43 @@ router.post("/invoices", async (req, res): Promise<void> => {
   });
   res.status(201).json(GetInvoiceResponse.parse(invoice));
 });
+router.put("/invoices/:id", async (req, res): Promise<void> => {
+  const parsed = UpdateInvoiceBody.safeParse(req.body);
+  if (!parsed.success) { res.status(400).json({ error: "Confira os dados da invoice.", details: parsed.error.flatten() }); return; }
+  const input = parsed.data;
+  if (!validDate(input.dueDate) || input.items.some(item => item.quantity <= 0 || !item.description.trim())) {
+    res.status(400).json({ error: "Informe data válida, descrições e quantidades positivas." }); return;
+  }
+  const customer = await find<Customer>("customers", input.customerId);
+  if (!customer) { res.status(400).json({ error: "Selecione um cliente cadastrado." }); return; }
+  const items = input.items.map(item => ({ ...item, description: item.description.trim(), unitPrice: money(item.unitPrice) }));
+  const subtotal = money(items.reduce((sum, item) => sum + money(item.quantity * item.unitPrice), 0));
+  const discount = money(input.discount);
+  if (discount > subtotal) { res.status(400).json({ error: "Desconto não pode superar o subtotal." }); return; }
+  let hoursTotal = 0;
+  for (const item of items) {
+    if (!item.productId) continue;
+    const product = await find<Product>("products", item.productId);
+    if (!product) { res.status(400).json({ error: "Um produto selecionado não existe mais." }); return; }
+    if (product.type === "hours") hoursTotal += product.hours * item.quantity;
+  }
+  const result = await db.transaction(async tx => {
+    await tx.select().from(healthfyEntities).where(eq(healthfyEntities.id, req.params.id)).for("update");
+    const current = await find<Invoice>("invoices", req.params.id, tx);
+    if (!current) return { kind: "missing" as const };
+    if (current.status !== "draft") return { kind: "locked" as const };
+    const updated = {
+      ...current, ...input, items, customer, subtotal, discount,
+      total: money(subtotal - discount), hoursTotal,
+    };
+    await replace("invoices", current.id, updated, tx);
+    await activity("Rascunho atualizado", `${current.number} · ${customer.name}`, "invoices", current.id, tx);
+    return { kind: "updated" as const, invoice: updated };
+  });
+  if (result.kind === "missing") { res.status(404).json({ error: "Invoice não encontrada." }); return; }
+  if (result.kind === "locked") { res.status(409).json({ error: "Somente rascunhos podem ser editados. Invoices emitidas, pagas ou canceladas preservam o histórico." }); return; }
+  res.json(GetInvoiceResponse.parse(result.invoice));
+});
 router.patch("/invoices/:id", async (req, res): Promise<void> => {
   const parsed = UpdateInvoiceStatusBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Status inválido." }); return; }
@@ -79,13 +116,17 @@ router.patch("/invoices/:id", async (req, res): Promise<void> => {
   res.json(GetInvoiceResponse.parse(result));
 });
 router.delete("/invoices/:id", async (req, res): Promise<void> => {
-  const invoice = await find<Invoice>("invoices", req.params.id);
-  if (!invoice) { res.status(404).json({ error: "Invoice não encontrada." }); return; }
-  if (invoice.status !== "draft") { res.status(409).json({ error: "Somente rascunhos podem ser excluídos. Cancele invoices emitidas." }); return; }
-  await db.transaction(async tx => {
+  const result = await db.transaction(async tx => {
+    await tx.select().from(healthfyEntities).where(eq(healthfyEntities.id, req.params.id)).for("update");
+    const invoice = await find<Invoice>("invoices", req.params.id, tx);
+    if (!invoice) return { kind: "missing" as const };
+    if (invoice.status !== "draft") return { kind: "locked" as const };
     await remove("invoices", invoice.id, tx);
     await activity("Rascunho excluído", invoice.number, "invoices", invoice.id, tx);
+    return { kind: "deleted" as const };
   });
+  if (result.kind === "missing") { res.status(404).json({ error: "Invoice não encontrada." }); return; }
+  if (result.kind === "locked") { res.status(409).json({ error: "Somente rascunhos podem ser excluídos. Invoices emitidas, pagas ou canceladas devem ser canceladas para preservar o histórico." }); return; }
   res.sendStatus(204);
 });
 export default router;

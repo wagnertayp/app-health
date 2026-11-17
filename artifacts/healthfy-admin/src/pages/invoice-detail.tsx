@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { Ban, CheckCircle2, Printer, Send, Trash2 } from "lucide-react";
+import { Ban, CheckCircle2, Pencil, Printer, Send, Trash2 } from "lucide-react";
 import { useDeleteInvoice, useGetInvoice, getGetInvoiceQueryKey, useUpdateInvoiceStatus, type InvoiceStatusInputStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Confirm, ErrorState, LoadingRows, PageHeader, Pill } from "@/components/kit";
 import { useInvalidateAll } from "@/components/records";
@@ -49,6 +50,7 @@ export default function InvoiceDetail() {
         actions={
           <>
             {i.status === "draft" && <Button variant="outline" size="sm" onClick={() => setPending("pending")} data-testid="button-issue"><Send className="mr-1.5 h-3.5 w-3.5" />Emitir</Button>}
+            {i.status === "draft" && <Button variant="outline" size="sm" asChild data-testid="button-edit-invoice"><Link href={`/invoices/${id}/editar`}><Pencil className="mr-1.5 h-3.5 w-3.5" />Editar</Link></Button>}
             {i.status === "pending" && <Button variant="outline" size="sm" onClick={() => setPending("paid")} data-testid="button-mark-paid"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />Registrar pagamento</Button>}
             {(i.status === "pending" || i.status === "draft") && <Button variant="outline" size="sm" onClick={() => setPending("cancelled")} data-testid="button-cancel-invoice"><Ban className="mr-1.5 h-3.5 w-3.5" />Cancelar</Button>}
             {i.status === "draft" && <Button variant="outline" size="sm" className="text-destructive" onClick={() => setConfirmDel(true)} data-testid="button-delete"><Trash2 className="mr-1.5 h-3.5 w-3.5" />Excluir</Button>}
@@ -152,7 +154,7 @@ export default function InvoiceDetail() {
         open={confirmDel}
         onOpenChange={setConfirmDel}
         title="Excluir rascunho?"
-        body="Esta ação não pode ser desfeita."
+        body="O rascunho será removido permanentemente. Invoices emitidas, pagas ou canceladas devem ser canceladas para preservar o histórico."
         confirmLabel="Excluir"
         destructive
         onConfirm={() => del.mutate({ id }, { onSuccess: () => { inv(); toast({ title: "Rascunho excluído" }); nav("/invoices"); }, onError: (e) => toast({ title: "Falha", description: errMsg(e), variant: "destructive" }) })}

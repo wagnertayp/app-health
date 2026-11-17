@@ -1019,6 +1019,106 @@ export const GetInvoiceResponse = zod.object({
 })
 
 
+export const UpdateInvoiceParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const updateInvoiceBodyItemsItemDescriptionMax = 500;
+
+export const updateInvoiceBodyItemsItemQuantityExclusiveMin = 0;
+export const updateInvoiceBodyItemsItemQuantityMax = 100000;
+
+export const updateInvoiceBodyItemsItemUnitPriceMin = 0;
+export const updateInvoiceBodyItemsItemUnitPriceMax = 10000000;
+
+export const updateInvoiceBodyItemsMax = 100;
+
+export const updateInvoiceBodyDueDateRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const updateInvoiceBodyDiscountMin = 0;
+
+export const updateInvoiceBodyNotesMax = 5000;
+
+export const updateInvoiceBodyPaymentTermsMax = 3000;
+
+
+
+export const UpdateInvoiceBody = zod.object({
+  "customerId": zod.string(),
+  "items": zod.array(zod.object({
+  "productId": zod.string().optional(),
+  "description": zod.string().min(1).max(updateInvoiceBodyItemsItemDescriptionMax),
+  "quantity": zod.number().gt(updateInvoiceBodyItemsItemQuantityExclusiveMin).max(updateInvoiceBodyItemsItemQuantityMax),
+  "unitPrice": zod.number().min(updateInvoiceBodyItemsItemUnitPriceMin).max(updateInvoiceBodyItemsItemUnitPriceMax)
+})).min(1).max(updateInvoiceBodyItemsMax),
+  "dueDate": zod.string().regex(updateInvoiceBodyDueDateRegExp),
+  "discount": zod.number().min(updateInvoiceBodyDiscountMin),
+  "notes": zod.string().max(updateInvoiceBodyNotesMax),
+  "paymentTerms": zod.string().max(updateInvoiceBodyPaymentTermsMax)
+})
+
+export const updateInvoiceResponseCustomerOneNameMax = 200;
+
+export const updateInvoiceResponseCustomerOneEmailMax = 250;
+
+export const updateInvoiceResponseCustomerOnePhoneMax = 60;
+
+export const updateInvoiceResponseCustomerOneDocumentMax = 60;
+
+export const updateInvoiceResponseCustomerOneAddressMax = 500;
+
+export const updateInvoiceResponseCustomerOneResponsibleMax = 200;
+
+export const updateInvoiceResponseCustomerOneNotesMax = 5000;
+
+export const updateInvoiceResponseCustomerOneLogoPathMax = 250;
+
+export const updateInvoiceResponseItemsItemDescriptionMax = 500;
+
+export const updateInvoiceResponseItemsItemQuantityExclusiveMin = 0;
+export const updateInvoiceResponseItemsItemQuantityMax = 100000;
+
+export const updateInvoiceResponseItemsItemUnitPriceMin = 0;
+export const updateInvoiceResponseItemsItemUnitPriceMax = 10000000;
+
+
+
+export const UpdateInvoiceResponse = zod.object({
+  "id": zod.string(),
+  "number": zod.string(),
+  "customerId": zod.string(),
+  "customer": zod.object({
+  "name": zod.string().min(1).max(updateInvoiceResponseCustomerOneNameMax),
+  "email": zod.string().max(updateInvoiceResponseCustomerOneEmailMax),
+  "phone": zod.string().max(updateInvoiceResponseCustomerOnePhoneMax),
+  "document": zod.string().max(updateInvoiceResponseCustomerOneDocumentMax),
+  "address": zod.string().max(updateInvoiceResponseCustomerOneAddressMax),
+  "status": zod.enum(['active', 'inactive', 'prospect']),
+  "responsible": zod.string().max(updateInvoiceResponseCustomerOneResponsibleMax),
+  "notes": zod.string().max(updateInvoiceResponseCustomerOneNotesMax),
+  "logoPath": zod.string().max(updateInvoiceResponseCustomerOneLogoPathMax).optional()
+}).and(zod.object({
+  "id": zod.string(),
+  "createdAt": zod.string()
+})),
+  "items": zod.array(zod.object({
+  "productId": zod.string().optional(),
+  "description": zod.string().min(1).max(updateInvoiceResponseItemsItemDescriptionMax),
+  "quantity": zod.number().gt(updateInvoiceResponseItemsItemQuantityExclusiveMin).max(updateInvoiceResponseItemsItemQuantityMax),
+  "unitPrice": zod.number().min(updateInvoiceResponseItemsItemUnitPriceMin).max(updateInvoiceResponseItemsItemUnitPriceMax)
+})),
+  "subtotal": zod.number(),
+  "discount": zod.number(),
+  "total": zod.number(),
+  "dueDate": zod.string(),
+  "status": zod.enum(['draft', 'pending', 'paid', 'cancelled']),
+  "notes": zod.string(),
+  "paymentTerms": zod.string(),
+  "createdAt": zod.string(),
+  "paidAt": zod.string().nullish(),
+  "hoursTotal": zod.number().optional().describe('Hours snapshotted at invoice creation')
+})
+
+
 export const UpdateInvoiceStatusParams = zod.object({
   "id": zod.coerce.string()
 })

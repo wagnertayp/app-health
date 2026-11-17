@@ -52,7 +52,8 @@ function Router() {
           <Route path="/clientes/projetos/:id" component={ProjetoDetail} />
           <Route path="/financeiro" component={Financeiro} />
           <Route path="/invoices" component={Invoices} />
-          <Route path="/invoices/nova" component={InvoiceNew} />
+          <Route path="/invoices/nova">{() => <InvoiceNew />}</Route>
+          <Route path="/invoices/:id/editar">{(params) => <InvoiceNew editMode invoiceId={params.id} />}</Route>
           <Route path="/invoices/:id" component={InvoiceDetail} />
           <Route path="/produtos" component={Produtos} />
           <Route path="/produtos/novo" component={ProdutoEditor} />

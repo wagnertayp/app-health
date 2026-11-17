@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link, useSearch } from "wouter";
-import { FilePlus2, FileText } from "lucide-react";
-import { useListInvoices } from "@workspace/api-client-react";
+import { FilePlus2, FileText, Pencil, Trash2 } from "lucide-react";
+import { useDeleteInvoice, useListInvoices, type Invoice } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { EmptyState, ErrorState, LoadingRows, PageHeader, Panel, Pill, SearchBox, Segmented, TableWrap, Td, Th } from "@/components/kit";
-import { brl, fmtDate, usePageMeta } from "@/lib/format";
+import { Confirm, EmptyState, ErrorState, LoadingRows, PageHeader, Panel, Pill, SearchBox, Segmented, TableWrap, Td, Th } from "@/components/kit";
+import { brl, errMsg, fmtDate, usePageMeta } from "@/lib/format";
 import { invoiceKey, invoiceStatusLabel, invoiceStatusTone } from "@/lib/status";
+import { useInvalidateAll } from "@/components/records";
+import { useToast } from "@/hooks/use-toast";
 
 type F = "all" | "draft" | "pending" | "overdue" | "paid" | "cancelled";
 
@@ -16,6 +18,10 @@ export default function Invoices() {
   const [f, setF] = useState<F>(initial);
   const [q, setQ] = useState("");
   const invoices = useListInvoices();
+  const del = useDeleteInvoice();
+  const invalidate = useInvalidateAll();
+  const { toast } = useToast();
+  const [toDelete, setToDelete] = useState<Invoice | null>(null);
   const rows = useMemo(
     () =>
       [...(invoices.data ?? [])]
@@ -37,7 +43,7 @@ export default function Invoices() {
           <EmptyState icon={FileText} title={invoices.data?.length ? "Nenhum resultado" : "Nenhuma invoice ainda"} body={invoices.data?.length ? "Ajuste o filtro ou a busca." : "Crie a primeira invoice a partir de um produto ou de linhas personalizadas."} action={!invoices.data?.length && <Button size="sm" asChild><Link href="/invoices/nova">Nova invoice</Link></Button>} />
         ) : (
           <TableWrap>
-            <thead className="border-b bg-muted/40"><tr><Th>Número</Th><Th>Cliente</Th><Th>Emissão</Th><Th>Vencimento</Th><Th>Status</Th><Th className="text-right">Total</Th></tr></thead>
+            <thead className="border-b bg-muted/40"><tr><Th>Número</Th><Th>Cliente</Th><Th>Emissão</Th><Th>Vencimento</Th><Th>Status</Th><Th className="text-right">Total</Th><Th>Ações</Th></tr></thead>
             <tbody>
               {rows.map((i) => {
                 const k = invoiceKey(i);
@@ -49,14 +55,37 @@ export default function Invoices() {
                     <Td className="text-muted-foreground">{fmtDate(i.dueDate)}</Td>
                     <Td><Pill tone={invoiceStatusTone[k]}>{invoiceStatusLabel[k]}</Pill></Td>
                     <Td className="num text-right font-medium">{brl(i.total)}</Td>
+                    <Td>
+                      {i.status === "draft" ? (
+                        <div className="flex items-center gap-1">
+                          <Button variant="outline" size="sm" asChild data-testid={`button-edit-${i.id}`}><Link href={`/invoices/${i.id}/editar`}><Pencil className="mr-1.5 h-3.5 w-3.5" />Editar</Link></Button>
+                          <Button variant="outline" size="sm" className="text-destructive" onClick={() => setToDelete(i)} data-testid={`button-delete-${i.id}`}><Trash2 className="mr-1.5 h-3.5 w-3.5" />Excluir</Button>
+                        </div>
+                      ) : <span className="text-xs text-muted-foreground">—</span>}
+                    </Td>
                   </tr>
                 );
               })}
-              <tr className="bg-muted/30"><Td className="text-xs text-muted-foreground">{rows.length} invoice(s)</Td><Td /><Td /><Td /><Td /><Td className="num text-right font-semibold">{brl(sum)}</Td></tr>
+              <tr className="bg-muted/30"><Td className="text-xs text-muted-foreground">{rows.length} invoice(s)</Td><Td /><Td /><Td /><Td /><Td className="num text-right font-semibold">{brl(sum)}</Td><Td /></tr>
             </tbody>
           </TableWrap>
         )}
       </Panel>
+      <Confirm
+        open={!!toDelete}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        title="Excluir rascunho?"
+        body={<span>O rascunho {toDelete?.number} será removido permanentemente. Invoices emitidas não podem ser excluídas.</span>}
+        confirmLabel={del.isPending ? "Excluindo..." : "Excluir rascunho"}
+        destructive
+        onConfirm={() => {
+          if (!toDelete) return;
+          del.mutate({ id: toDelete.id }, {
+            onSuccess: () => { invalidate(); toast({ title: "Rascunho excluído" }); setToDelete(null); },
+            onError: (e) => toast({ title: "Não foi possível excluir", description: errMsg(e), variant: "destructive" }),
+          });
+        }}
+      />
     </div>
   );
 }

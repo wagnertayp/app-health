@@ -300,6 +300,23 @@ export interface InvoiceInput {
   status: InvoiceInputStatus;
 }
 
+export interface InvoiceUpdate {
+  customerId: string;
+  /**
+     * @minItems 1
+     * @maxItems 100
+     */
+  items: InvoiceLineInput[];
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  dueDate: string;
+  /** @minimum 0 */
+  discount: number;
+  /** @maxLength 5000 */
+  notes: string;
+  /** @maxLength 3000 */
+  paymentTerms: string;
+}
+
 export type InvoiceStatusInputStatus = typeof InvoiceStatusInputStatus[keyof typeof InvoiceStatusInputStatus];
 
 
