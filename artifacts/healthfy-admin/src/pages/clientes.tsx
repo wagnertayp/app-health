@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Contact, FilePlus2, FolderOpen, Pencil, Plus, Rows3, Trash2 } from "lucide-react";
+import { Contact, FilePlus2, FolderOpen, Paperclip, Pencil, Plus, Rows3, Trash2 } from "lucide-react";
+import { CustomerHistory } from "@/components/customer-entries/customer-history";
 import {
   useCreateCustomer, useDeleteCustomer, useListActivity, useListCustomers, useListInvoices, useUpdateCustomer,
   type Customer, type CustomerInput,
@@ -65,7 +66,12 @@ export function CustomerDialog({ open, onOpenChange, customer, initialData, onSa
   );
 }
 
-function CustomerSheet({ c, onClose, onEdit }: { c: Customer | null; onClose: () => void; onEdit: (c: Customer) => void }) {
+function CustomerSheet({ c, onClose, onEdit, focusHistory }: { c: Customer | null; onClose: () => void; onEdit: (c: Customer) => void; focusHistory?: boolean }) {
+  useEffect(() => {
+    if (!c || !focusHistory) return;
+    const t = setTimeout(() => document.getElementById("customer-history")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250);
+    return () => clearTimeout(t);
+  }, [c?.id, focusHistory]);
   const invoices = useListInvoices();
   const projects = useRecords("projects");
   const activity = useListActivity();
@@ -76,7 +82,7 @@ function CustomerSheet({ c, onClose, onEdit }: { c: Customer | null; onClose: ()
   const myAct = (activity.data ?? []).filter((a) => ids.has(a.entityId)).slice(0, 12);
   return (
     <Sheet open={!!c} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl lg:max-w-3xl">
         <SheetHeader>
           <div className="flex flex-col items-start gap-4">
             <CustomerLogo name={c.name} path={c.logoPath} className="h-32 w-32 rounded-2xl shadow-sm" textClass="text-4xl" />
@@ -86,6 +92,7 @@ function CustomerSheet({ c, onClose, onEdit }: { c: Customer | null; onClose: ()
         <div className="mt-5 flex flex-wrap gap-2">
           <Pill tone={customerStatusTone[c.status]}>{customerStatusLabel[c.status]}</Pill>
           <Button size="sm" variant="outline" onClick={() => onEdit(c)} data-testid="button-edit-customer"><Pencil className="mr-1 h-3.5 w-3.5" />Editar</Button>
+          <Button className="h-12 px-5" variant="outline" onClick={() => document.getElementById("customer-history")?.scrollIntoView({ behavior: "smooth", block: "start" })} data-testid="button-sheet-entries"><Paperclip className="mr-2 h-5 w-5" />Anexos e registros</Button>
           <Button size="sm" asChild><Link href={`/invoices/nova?customer=${c.id}`}><FilePlus2 className="mr-1 h-3.5 w-3.5" />Nova invoice</Link></Button>
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-3 rounded-lg border p-4 text-sm">
@@ -98,7 +105,8 @@ function CustomerSheet({ c, onClose, onEdit }: { c: Customer | null; onClose: ()
         {myProj.length ? myProj.map((p) => <Link key={p.id} href={`/clientes/projetos/${p.id}`} className="flex justify-between rounded-md px-2 py-1.5 text-sm hover:bg-muted"><span>{p.title}</span><span className="text-xs text-muted-foreground">{p.status}</span></Link>) : <p className="text-xs text-muted-foreground">Nenhum projeto vinculado.</p>}
         <h4 className="mt-6 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Invoices ({myInv.length})</h4>
         {myInv.length ? myInv.map((i) => { const k = invoiceKey(i); return <Link key={i.id} href={`/invoices/${i.id}`} className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-muted"><span className="num">{i.number}</span><Pill tone={invoiceStatusTone[k]}>{invoiceStatusLabel[k]}</Pill><span className="num">{brl(i.total)}</span></Link>; }) : <p className="text-xs text-muted-foreground">Nenhuma invoice.</p>}
-        <h4 className="mt-6 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Histórico</h4>
+                <CustomerHistory key={c.id} customerId={c.id} />
+        <h4 className="mt-8 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Atividade do sistema</h4>
         {myAct.length ? <ol className="space-y-2 border-l pl-4">{myAct.map((a) => <li key={a.id} className="text-sm"><div className="font-medium">{a.title}</div><div className="text-xs text-muted-foreground">{a.description} · {relative(a.createdAt)}</div></li>)}</ol> : <p className="text-xs text-muted-foreground">Sem eventos registrados.</p>}
       </SheetContent>
     </Sheet>
@@ -117,6 +125,8 @@ export default function Clientes() {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<Customer | null>(null);
   const [toDel, setToDel] = useState<Customer | null>(null);
+  const [focusHist, setFocusHist] = useState(false);
+  const openView = (c: Customer, hist = false) => { setFocusHist(hist); setView(c); };
   const [mode, setMode] = useState<"folders" | "table">("folders");
   const [openId, setOpenId] = useState<string | null>(null);
   const [, nav] = useLocation();
@@ -139,15 +149,15 @@ export default function Clientes() {
               const mp = (projects.data ?? []).filter((p) => p.customerId === c.id);
               const mi = (invoices.data ?? []).filter((x) => x.customerId === c.id);
               const files: FolderFile[] = [
-                { key: "act-" + c.id, kind: "action", name: "Ficha do cliente", meta: customerStatusLabel[c.status], big: c.responsible || "Sem responsável", detail: c.email || c.phone || "Abrir detalhes", onSelect: () => setView(c), testId: `sheet-view-${c.id}` },
+                { key: "act-" + c.id, kind: "action", name: "Ficha do cliente", meta: customerStatusLabel[c.status], big: c.responsible || "Sem responsável", detail: c.email || c.phone || "Abrir detalhes", onSelect: () => openView(c), testId: `sheet-view-${c.id}` },
                 ...mi.slice(0, 2).map((x): FolderFile => { const k = invoiceKey(x); return { key: "inv-" + x.id, name: `Invoice ${x.number}`, meta: invoiceStatusLabel[k], big: brl(x.total), detail: `Vence ${fmtDate(x.dueDate)}`, onSelect: () => nav(`/invoices/${x.id}`), testId: `sheet-invoice-${x.id}` }; }),
                 ...mp.slice(0, 2).map((p): FolderFile => ({ key: "prj-" + p.id, name: p.title, meta: "Projeto", big: p.status, detail: p.responsible || undefined, onSelect: () => nav(`/clientes/projetos/${p.id}`), testId: `sheet-project-${p.id}` })),
               ];
               const arts: ArtPreset[] = ["aurora", "glacier", "dusk", "verdant", "ember"];
               const h = hashString(c.id);
               return (
+                <div key={c.id} className="min-w-0">
                 <FluidGlassFolder
-                  key={c.id}
                   testId={`folder-customer-${c.id}`}
                   label={c.name}
                   logoUrl={logoSrc(c.logoPath)}
@@ -162,11 +172,18 @@ export default function Clientes() {
                   onOpenChange={(o) => setOpenId(o ? c.id : null)}
                   menu={[
                     { label: "Ver ficha", onSelect: () => setView(c), testId: `menu-view-${c.id}` },
+                    { label: "Anexos e registros", onSelect: () => openView(c, true), testId: `menu-entries-${c.id}` },
                     { label: "Editar", onSelect: () => { setEdit(c); setOpen(true); }, testId: `button-edit-${c.id}` },
                     { label: "Nova invoice", onSelect: () => nav(`/invoices/nova?customer=${c.id}`), testId: `menu-invoice-${c.id}` },
                     { label: "Excluir", danger: true, onSelect: () => setToDel(c), testId: `button-delete-${c.id}` },
                   ]}
                 />
+                  <div className="px-9">
+                    <Button variant="outline" className="mx-auto flex h-12 w-full max-w-[420px] gap-2 text-sm" onClick={() => openView(c, true)} data-testid={`button-folder-entries-${c.id}`}>
+                      <Paperclip className="h-5 w-5 shrink-0" />Anexos e registros
+                    </Button>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -180,7 +197,8 @@ export default function Clientes() {
                 <Td>{c.responsible || "—"}</Td>
                 <Td><Pill tone={customerStatusTone[c.status]}>{customerStatusLabel[c.status]}</Pill></Td>
                 <Td className="text-right" ><span onClick={(e) => e.stopPropagation()} className="inline-flex gap-1">
-                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setEdit(c); setOpen(true); }} data-testid={`button-edit-${c.id}`}><Pencil className="h-3.5 w-3.5" /></Button>
+                  <Button variant="outline" className="h-10 px-3" onClick={() => openView(c, true)} data-testid={`button-entries-${c.id}`}><Paperclip className="mr-1.5 h-4 w-4" />Anexos e registros</Button>
+                  <Button size="icon" variant="ghost" className="h-10 w-10" onClick={() => { setEdit(c); setOpen(true); }} data-testid={`button-edit-${c.id}`}><Pencil className="h-3.5 w-3.5" /></Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setToDel(c)} data-testid={`button-delete-${c.id}`}><Trash2 className="h-3.5 w-3.5" /></Button>
                 </span></Td>
               </tr>))}</tbody>
@@ -188,7 +206,7 @@ export default function Clientes() {
         )}
       </Panel>
       <CustomerDialog open={open} onOpenChange={setOpen} customer={edit} onSaved={(c) => view && setView(c)} />
-      <CustomerSheet c={view} onClose={() => setView(null)} onEdit={(c) => { setEdit(c); setOpen(true); }} />
+      <CustomerSheet focusHistory={focusHist} c={view} onClose={() => setView(null)} onEdit={(c) => { setEdit(c); setOpen(true); }} />
       <Confirm open={!!toDel} onOpenChange={(o) => !o && setToDel(null)} title="Excluir cliente?" body="Invoices emitidas mantêm o snapshot do cliente. Esta ação não pode ser desfeita." confirmLabel="Excluir" destructive
         onConfirm={() => toDel && del.mutate({ id: toDel.id }, { onSuccess: () => { inv(); toast({ title: "Cliente excluído" }); setToDel(null); }, onError: (e) => toast({ title: "Não foi possível excluir", description: errMsg(e), variant: "destructive" }) })} />
     </div>

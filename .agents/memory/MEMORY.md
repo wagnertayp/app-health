@@ -1,1 +1,2 @@
 - [App Storage SDK compatibility](storage-sdk-compatibility.md) — keep sidecar-compatible Google client majors; upload URLs alone do not validate server-side storage access.
+- [Preview and download contracts](orval-download-contracts.md) — distinct paths avoid colliding parameter exports in the current generator.

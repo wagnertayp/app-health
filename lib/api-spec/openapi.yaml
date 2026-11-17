@@ -6,6 +6,94 @@ info:
 servers:
   - url: /api
 paths:
+  /customers/{customerId}/entries:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCustomerEntries
+      responses:
+        "200":
+          description: Private customer history
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/CustomerEntry" } }
+    post:
+      operationId: createCustomerEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerEntryInput" }
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerEntry" }
+  /customers/{customerId}/entries/{entryId}:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: entryId, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: updateCustomerEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerEntryInput" }
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerEntry" }
+    delete:
+      operationId: deleteCustomerEntry
+      responses:
+        "204": { description: Entry removed; original stored files retained privately }
+  /customers/{customerId}/attachment-uploads:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: requestCustomerAttachmentUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerAttachmentUploadInput" }
+      responses:
+        "200":
+          description: Private direct upload URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerAttachmentUpload" }
+  /customers/{customerId}/entries/{entryId}/files/{fileId}:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: entryId, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: fileId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCustomerEntryFile
+      responses:
+        "200":
+          description: Protected PDF, image, audio or text
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "206": { description: Partial audio content }
+  /customers/{customerId}/entries/{entryId}/files/{fileId}/download:
+    parameters:
+      - { name: customerId, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: entryId, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: fileId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: downloadCustomerEntryFile
+      responses:
+        "200":
+          description: Protected attachment download
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
   /auth/user:
     get:
       operationId: getCurrentAuthUser
@@ -278,6 +366,55 @@ paths:
               schema: { type: array, items: { $ref: "#/components/schemas/Activity" } }
 components:
   schemas:
+    CustomerEntryInput:
+      type: object
+      required: [title, content, category, status, priority, responsible, tags, dueDate, attachmentPaths]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        content: { type: string, maxLength: 20000 }
+        category: { type: string, enum: [sac, update, document, finance, other] }
+        status: { type: string, enum: [open, in_progress, resolved, archived] }
+        priority: { type: string, enum: [low, medium, high] }
+        responsible: { type: string, maxLength: 200 }
+        tags: { type: array, maxItems: 20, items: { type: string, minLength: 1, maxLength: 50 } }
+        dueDate: { type: string, maxLength: 10 }
+        attachmentPaths: { type: array, maxItems: 10, items: { type: string, maxLength: 100 } }
+    CustomerAttachment:
+      type: object
+      required: [id, objectPath, name, contentType, size]
+      properties:
+        id: { type: string, format: uuid }
+        objectPath: { type: string }
+        name: { type: string }
+        contentType: { type: string }
+        size: { type: integer }
+    CustomerEntry:
+      allOf:
+        - { $ref: "#/components/schemas/CustomerEntryInput" }
+        - type: object
+          required: [id, customerId, createdAt, updatedAt, createdBy, attachments]
+          properties:
+            id: { type: string, format: uuid }
+            customerId: { type: string, format: uuid }
+            createdAt: { type: string }
+            updatedAt: { type: string }
+            createdBy: { type: string }
+            attachments: { type: array, items: { $ref: "#/components/schemas/CustomerAttachment" } }
+    CustomerAttachmentUploadInput:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        size: { type: integer, minimum: 1, maximum: 52428800 }
+        contentType:
+          type: string
+          enum: [application/pdf, image/png, image/jpeg, image/webp, image/gif, audio/mpeg, audio/mp4, audio/aac, audio/wav, audio/x-wav, audio/ogg, audio/webm, audio/flac, audio/x-m4a, text/plain, text/csv, text/markdown]
+    CustomerAttachmentUpload:
+      type: object
+      required: [uploadURL, attachment]
+      properties:
+        uploadURL: { type: string }
+        attachment: { $ref: "#/components/schemas/CustomerAttachment" }
     AuthUser:
       type: object
       required: [id, email, firstName, lastName, profileImageUrl]

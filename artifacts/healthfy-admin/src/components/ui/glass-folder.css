@@ -4,6 +4,16 @@
   box-shadow: none;
   overflow: visible;
 }
+.customer-entry-editor .field {
+  min-height: 48px;
+  font-size: 16px;
+}
+#customer-history .field {
+  min-height: 44px;
+}
+.customer-entry-editor textarea.field {
+  min-height: 128px;
+}
 .clients-floating-view > .card-surface > header {
   border-bottom: 0;
   padding-inline: 0;
@@ -29,8 +39,8 @@
   font-size: 15px;
 }
 .clients-list-view table td button {
-  width: 40px;
-  height: 40px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .clients-list-view table td button svg {
   width: 16px;

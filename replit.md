@@ -42,6 +42,8 @@ Painel em português para a operação da Healthfy IA: clientes, produtos, banco
 - The initial reference product is based on the supplied contract: 10 hours at R$200/hour, R$2,000 total, R$1,000 entry and R$1,000 at completion.
 - Invoices are non-fiscal billing documents, printable via the browser. Paid status is a manual administrative declaration, not gateway verification.
 - CRM, projects, agenda, agent configuration, tracking and hour records are persisted operational records. No external calendar, ad platform or AI runtime is connected.
+- Each client's details include private entries categorized as SAC, updates, documents, finance or other, with description, responsible person, status, priority, due date and tags. Entries can contain text alone or up to 10 PDF/raster-image/audio/text attachments, 50 MB each, uploaded directly to App Storage. Keep controls large and accessible.
+- Client attachment bytes never go into PostgreSQL. Uploads must match their actual MIME signatures, size, issuing admin and customer. Finalized object generations are pinned; file viewing/downloading requires an authorized session, an existing customer and a live entry attachment reference. Removing a reference or entry revokes its file URL; original objects stay private rather than being destructively purged.
 
 ## User preferences
 

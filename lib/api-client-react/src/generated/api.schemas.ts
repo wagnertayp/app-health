@@ -5,6 +5,123 @@
  * Healthfy management API
  * OpenAPI spec version: 0.1.0
  */
+export type CustomerEntryInputCategory = typeof CustomerEntryInputCategory[keyof typeof CustomerEntryInputCategory];
+
+
+export const CustomerEntryInputCategory = {
+  sac: 'sac',
+  update: 'update',
+  document: 'document',
+  finance: 'finance',
+  other: 'other',
+} as const;
+
+export type CustomerEntryInputStatus = typeof CustomerEntryInputStatus[keyof typeof CustomerEntryInputStatus];
+
+
+export const CustomerEntryInputStatus = {
+  open: 'open',
+  in_progress: 'in_progress',
+  resolved: 'resolved',
+  archived: 'archived',
+} as const;
+
+export type CustomerEntryInputPriority = typeof CustomerEntryInputPriority[keyof typeof CustomerEntryInputPriority];
+
+
+export const CustomerEntryInputPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface CustomerEntryInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /** @maxLength 20000 */
+  content: string;
+  category: CustomerEntryInputCategory;
+  status: CustomerEntryInputStatus;
+  priority: CustomerEntryInputPriority;
+  /** @maxLength 200 */
+  responsible: string;
+  /**
+     * @maxItems 20
+     * @items.minLength 1
+     * @items.maxLength 50
+     */
+  tags: string[];
+  /** @maxLength 10 */
+  dueDate: string;
+  /**
+     * @maxItems 10
+     * @items.maxLength 100
+     */
+  attachmentPaths: string[];
+}
+
+export interface CustomerAttachment {
+  id: string;
+  objectPath: string;
+  name: string;
+  contentType: string;
+  size: number;
+}
+
+export type CustomerEntry = CustomerEntryInput & {
+  id: string;
+  customerId: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  attachments: CustomerAttachment[];
+};
+
+export type CustomerAttachmentUploadInputContentType = typeof CustomerAttachmentUploadInputContentType[keyof typeof CustomerAttachmentUploadInputContentType];
+
+
+export const CustomerAttachmentUploadInputContentType = {
+  'application/pdf': 'application/pdf',
+  'image/png': 'image/png',
+  'image/jpeg': 'image/jpeg',
+  'image/webp': 'image/webp',
+  'image/gif': 'image/gif',
+  'audio/mpeg': 'audio/mpeg',
+  'audio/mp4': 'audio/mp4',
+  'audio/aac': 'audio/aac',
+  'audio/wav': 'audio/wav',
+  'audio/x-wav': 'audio/x-wav',
+  'audio/ogg': 'audio/ogg',
+  'audio/webm': 'audio/webm',
+  'audio/flac': 'audio/flac',
+  'audio/x-m4a': 'audio/x-m4a',
+  'text/plain': 'text/plain',
+  'text/csv': 'text/csv',
+  'text/markdown': 'text/markdown',
+} as const;
+
+export interface CustomerAttachmentUploadInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 52428800
+     */
+  size: number;
+  contentType: CustomerAttachmentUploadInputContentType;
+}
+
+export interface CustomerAttachmentUpload {
+  uploadURL: string;
+  attachment: CustomerAttachment;
+}
+
 export interface AuthUser {
   id: string;
   /** @nullable */

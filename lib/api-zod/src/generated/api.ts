@@ -8,6 +8,266 @@
 import * as zod from 'zod';
 
 
+export const ListCustomerEntriesParams = zod.object({
+  "customerId": zod.coerce.string().uuid()
+})
+
+export const listCustomerEntriesResponseOneTitleMax = 200;
+
+export const listCustomerEntriesResponseOneContentMax = 20000;
+
+export const listCustomerEntriesResponseOneResponsibleMax = 200;
+
+export const listCustomerEntriesResponseOneTagsItemMax = 50;
+
+export const listCustomerEntriesResponseOneTagsMax = 20;
+
+export const listCustomerEntriesResponseOneDueDateMax = 10;
+
+export const listCustomerEntriesResponseOneAttachmentPathsItemMax = 100;
+
+export const listCustomerEntriesResponseOneAttachmentPathsMax = 10;
+
+
+
+export const ListCustomerEntriesResponseItem = zod.object({
+  "title": zod.string().min(1).max(listCustomerEntriesResponseOneTitleMax),
+  "content": zod.string().max(listCustomerEntriesResponseOneContentMax),
+  "category": zod.enum(['sac', 'update', 'document', 'finance', 'other']),
+  "status": zod.enum(['open', 'in_progress', 'resolved', 'archived']),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "responsible": zod.string().max(listCustomerEntriesResponseOneResponsibleMax),
+  "tags": zod.array(zod.string().min(1).max(listCustomerEntriesResponseOneTagsItemMax)).max(listCustomerEntriesResponseOneTagsMax),
+  "dueDate": zod.string().max(listCustomerEntriesResponseOneDueDateMax),
+  "attachmentPaths": zod.array(zod.string().max(listCustomerEntriesResponseOneAttachmentPathsItemMax)).max(listCustomerEntriesResponseOneAttachmentPathsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "customerId": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "createdBy": zod.string(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "objectPath": zod.string(),
+  "name": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int()
+}))
+}))
+export const ListCustomerEntriesResponse = zod.array(ListCustomerEntriesResponseItem)
+
+
+export const CreateCustomerEntryParams = zod.object({
+  "customerId": zod.coerce.string().uuid()
+})
+
+export const createCustomerEntryBodyTitleMax = 200;
+
+export const createCustomerEntryBodyContentMax = 20000;
+
+export const createCustomerEntryBodyResponsibleMax = 200;
+
+export const createCustomerEntryBodyTagsItemMax = 50;
+
+export const createCustomerEntryBodyTagsMax = 20;
+
+export const createCustomerEntryBodyDueDateMax = 10;
+
+export const createCustomerEntryBodyAttachmentPathsItemMax = 100;
+
+export const createCustomerEntryBodyAttachmentPathsMax = 10;
+
+
+
+export const CreateCustomerEntryBody = zod.object({
+  "title": zod.string().min(1).max(createCustomerEntryBodyTitleMax),
+  "content": zod.string().max(createCustomerEntryBodyContentMax),
+  "category": zod.enum(['sac', 'update', 'document', 'finance', 'other']),
+  "status": zod.enum(['open', 'in_progress', 'resolved', 'archived']),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "responsible": zod.string().max(createCustomerEntryBodyResponsibleMax),
+  "tags": zod.array(zod.string().min(1).max(createCustomerEntryBodyTagsItemMax)).max(createCustomerEntryBodyTagsMax),
+  "dueDate": zod.string().max(createCustomerEntryBodyDueDateMax),
+  "attachmentPaths": zod.array(zod.string().max(createCustomerEntryBodyAttachmentPathsItemMax)).max(createCustomerEntryBodyAttachmentPathsMax)
+})
+
+export const createCustomerEntryResponseOneTitleMax = 200;
+
+export const createCustomerEntryResponseOneContentMax = 20000;
+
+export const createCustomerEntryResponseOneResponsibleMax = 200;
+
+export const createCustomerEntryResponseOneTagsItemMax = 50;
+
+export const createCustomerEntryResponseOneTagsMax = 20;
+
+export const createCustomerEntryResponseOneDueDateMax = 10;
+
+export const createCustomerEntryResponseOneAttachmentPathsItemMax = 100;
+
+export const createCustomerEntryResponseOneAttachmentPathsMax = 10;
+
+
+
+export const CreateCustomerEntryResponse = zod.object({
+  "title": zod.string().min(1).max(createCustomerEntryResponseOneTitleMax),
+  "content": zod.string().max(createCustomerEntryResponseOneContentMax),
+  "category": zod.enum(['sac', 'update', 'document', 'finance', 'other']),
+  "status": zod.enum(['open', 'in_progress', 'resolved', 'archived']),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "responsible": zod.string().max(createCustomerEntryResponseOneResponsibleMax),
+  "tags": zod.array(zod.string().min(1).max(createCustomerEntryResponseOneTagsItemMax)).max(createCustomerEntryResponseOneTagsMax),
+  "dueDate": zod.string().max(createCustomerEntryResponseOneDueDateMax),
+  "attachmentPaths": zod.array(zod.string().max(createCustomerEntryResponseOneAttachmentPathsItemMax)).max(createCustomerEntryResponseOneAttachmentPathsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "customerId": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "createdBy": zod.string(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "objectPath": zod.string(),
+  "name": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int()
+}))
+}))
+
+
+export const UpdateCustomerEntryParams = zod.object({
+  "customerId": zod.coerce.string().uuid(),
+  "entryId": zod.coerce.string().uuid()
+})
+
+export const updateCustomerEntryBodyTitleMax = 200;
+
+export const updateCustomerEntryBodyContentMax = 20000;
+
+export const updateCustomerEntryBodyResponsibleMax = 200;
+
+export const updateCustomerEntryBodyTagsItemMax = 50;
+
+export const updateCustomerEntryBodyTagsMax = 20;
+
+export const updateCustomerEntryBodyDueDateMax = 10;
+
+export const updateCustomerEntryBodyAttachmentPathsItemMax = 100;
+
+export const updateCustomerEntryBodyAttachmentPathsMax = 10;
+
+
+
+export const UpdateCustomerEntryBody = zod.object({
+  "title": zod.string().min(1).max(updateCustomerEntryBodyTitleMax),
+  "content": zod.string().max(updateCustomerEntryBodyContentMax),
+  "category": zod.enum(['sac', 'update', 'document', 'finance', 'other']),
+  "status": zod.enum(['open', 'in_progress', 'resolved', 'archived']),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "responsible": zod.string().max(updateCustomerEntryBodyResponsibleMax),
+  "tags": zod.array(zod.string().min(1).max(updateCustomerEntryBodyTagsItemMax)).max(updateCustomerEntryBodyTagsMax),
+  "dueDate": zod.string().max(updateCustomerEntryBodyDueDateMax),
+  "attachmentPaths": zod.array(zod.string().max(updateCustomerEntryBodyAttachmentPathsItemMax)).max(updateCustomerEntryBodyAttachmentPathsMax)
+})
+
+export const updateCustomerEntryResponseOneTitleMax = 200;
+
+export const updateCustomerEntryResponseOneContentMax = 20000;
+
+export const updateCustomerEntryResponseOneResponsibleMax = 200;
+
+export const updateCustomerEntryResponseOneTagsItemMax = 50;
+
+export const updateCustomerEntryResponseOneTagsMax = 20;
+
+export const updateCustomerEntryResponseOneDueDateMax = 10;
+
+export const updateCustomerEntryResponseOneAttachmentPathsItemMax = 100;
+
+export const updateCustomerEntryResponseOneAttachmentPathsMax = 10;
+
+
+
+export const UpdateCustomerEntryResponse = zod.object({
+  "title": zod.string().min(1).max(updateCustomerEntryResponseOneTitleMax),
+  "content": zod.string().max(updateCustomerEntryResponseOneContentMax),
+  "category": zod.enum(['sac', 'update', 'document', 'finance', 'other']),
+  "status": zod.enum(['open', 'in_progress', 'resolved', 'archived']),
+  "priority": zod.enum(['low', 'medium', 'high']),
+  "responsible": zod.string().max(updateCustomerEntryResponseOneResponsibleMax),
+  "tags": zod.array(zod.string().min(1).max(updateCustomerEntryResponseOneTagsItemMax)).max(updateCustomerEntryResponseOneTagsMax),
+  "dueDate": zod.string().max(updateCustomerEntryResponseOneDueDateMax),
+  "attachmentPaths": zod.array(zod.string().max(updateCustomerEntryResponseOneAttachmentPathsItemMax)).max(updateCustomerEntryResponseOneAttachmentPathsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "customerId": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "createdBy": zod.string(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "objectPath": zod.string(),
+  "name": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int()
+}))
+}))
+
+
+export const DeleteCustomerEntryParams = zod.object({
+  "customerId": zod.coerce.string().uuid(),
+  "entryId": zod.coerce.string().uuid()
+})
+
+export const DeleteCustomerEntryResponse = zod.void()
+
+
+export const RequestCustomerAttachmentUploadParams = zod.object({
+  "customerId": zod.coerce.string().uuid()
+})
+
+export const requestCustomerAttachmentUploadBodyNameMax = 200;
+
+export const requestCustomerAttachmentUploadBodySizeMax = 52428800;
+
+
+
+export const RequestCustomerAttachmentUploadBody = zod.object({
+  "name": zod.string().min(1).max(requestCustomerAttachmentUploadBodyNameMax),
+  "size": zod.number().int().min(1).max(requestCustomerAttachmentUploadBodySizeMax),
+  "contentType": zod.enum(['application/pdf', 'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'audio/mpeg', 'audio/mp4', 'audio/aac', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm', 'audio/flac', 'audio/x-m4a', 'text/plain', 'text/csv', 'text/markdown'])
+})
+
+export const RequestCustomerAttachmentUploadResponse = zod.object({
+  "uploadURL": zod.string(),
+  "attachment": zod.object({
+  "id": zod.string().uuid(),
+  "objectPath": zod.string(),
+  "name": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int()
+})
+})
+
+
+export const GetCustomerEntryFileParams = zod.object({
+  "customerId": zod.coerce.string().uuid(),
+  "entryId": zod.coerce.string().uuid(),
+  "fileId": zod.coerce.string().uuid()
+})
+
+export const GetCustomerEntryFileResponse = zod.unknown()
+
+
+export const DownloadCustomerEntryFileParams = zod.object({
+  "customerId": zod.coerce.string().uuid(),
+  "entryId": zod.coerce.string().uuid(),
+  "fileId": zod.coerce.string().uuid()
+})
+
+export const DownloadCustomerEntryFileResponse = zod.unknown()
+
+
 export const GetCurrentAuthUserResponse = zod.object({
   "user": zod.union([zod.object({
   "id": zod.string(),

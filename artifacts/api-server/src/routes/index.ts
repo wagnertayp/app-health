@@ -6,6 +6,7 @@ import recordsRouter from "./records";
 import overviewRouter from "./overview";
 import authRouter from "./auth";
 import storageRouter from "./storage";
+import customerEntriesRouter from "./customer-entries";
 import { requireAdmin } from "../middlewares/authMiddleware";
 
 const router: IRouter = Router();
@@ -17,6 +18,7 @@ router.all(/^\/checkout(?:\/.*)?$/, (_req, res) => {
 router.use(authRouter);
 router.use(storageRouter);
 router.use(requireAdmin);
+router.use(customerEntriesRouter);
 router.use(catalogRouter);
 router.use(invoiceRouter);
 router.use(recordsRouter);

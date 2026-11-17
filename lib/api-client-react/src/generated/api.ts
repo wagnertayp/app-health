@@ -29,6 +29,10 @@ import type {
   AuthUserEnvelope,
   BeginBrowserLoginParams,
   Customer,
+  CustomerAttachmentUpload,
+  CustomerAttachmentUploadInput,
+  CustomerEntry,
+  CustomerEntryInput,
   CustomerInput,
   GetOverviewParams,
   HealthStatus,
@@ -71,6 +75,644 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListCustomerEntriesUrl = (customerId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries`
+}
+
+export const listCustomerEntries = async (customerId: string, options?: Parameters<typeof customFetch>[1]): Promise<CustomerEntry[]> => {
+
+  return customFetch<CustomerEntry[]>(getListCustomerEntriesUrl(customerId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCustomerEntriesQueryKey = (customerId: string,) => {
+    return [
+    `/api/customers/${customerId}/entries`
+    ] as const;
+    }
+
+
+export const getListCustomerEntriesQueryOptions = <TData = Awaited<ReturnType<typeof listCustomerEntries>>, TError = ErrorType<unknown>>(customerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCustomerEntriesQueryKey(customerId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCustomerEntries>>> = ({ signal }) => listCustomerEntries(customerId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: customerId !== null && customerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCustomerEntriesQueryResult = NonNullable<Awaited<ReturnType<typeof listCustomerEntries>>>
+export type ListCustomerEntriesQueryError = ErrorType<unknown>
+
+
+export function useListCustomerEntries<TData = Awaited<ReturnType<typeof listCustomerEntries>>, TError = ErrorType<unknown>>(
+ customerId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCustomerEntries>>,
+          TError,
+          Awaited<ReturnType<typeof listCustomerEntries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCustomerEntries<TData = Awaited<ReturnType<typeof listCustomerEntries>>, TError = ErrorType<unknown>>(
+ customerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCustomerEntries>>,
+          TError,
+          Awaited<ReturnType<typeof listCustomerEntries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCustomerEntries<TData = Awaited<ReturnType<typeof listCustomerEntries>>, TError = ErrorType<unknown>>(
+ customerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListCustomerEntries<TData = Awaited<ReturnType<typeof listCustomerEntries>>, TError = ErrorType<unknown>>(
+ customerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCustomerEntries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCustomerEntriesQueryOptions(customerId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateCustomerEntryUrl = (customerId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries`
+}
+
+export const createCustomerEntry = async (customerId: string,
+    customerEntryInput: CustomerEntryInput, options?: Parameters<typeof customFetch>[1]): Promise<CustomerEntry> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CustomerEntry>(getCreateCustomerEntryUrl(customerId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(customerEntryInput)
+  }
+);}
+
+
+
+
+
+export const getCreateCustomerEntryMutationKey = () => ['createCustomerEntry'] as const;
+
+export const getCreateCustomerEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCustomerEntry>>, TError,CreateCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCustomerEntry>>, TError,CreateCustomerEntryMutationVariables, TContext> => {
+
+const mutationKey = getCreateCustomerEntryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCustomerEntry>>, CreateCustomerEntryMutationVariables> = (props) => {
+          const {customerId,data} = props ?? {};
+
+          return  createCustomerEntry(customerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCustomerEntryMutationResult = NonNullable<Awaited<ReturnType<typeof createCustomerEntry>>>
+    export type CreateCustomerEntryMutationBody = BodyType<CustomerEntryInput>
+    export type CreateCustomerEntryMutationError = ErrorType<unknown>
+    export type CreateCustomerEntryMutationVariables = {customerId: string;data: BodyType<CustomerEntryInput>}
+
+    export const useCreateCustomerEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCustomerEntry>>, TError,CreateCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createCustomerEntry>>,
+        TError,
+        CreateCustomerEntryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateCustomerEntryMutationOptions(options), queryClient);
+    }
+
+export const getUpdateCustomerEntryUrl = (customerId: string,
+    entryId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries/${entryId}`
+}
+
+export const updateCustomerEntry = async (customerId: string,
+    entryId: string,
+    customerEntryInput: CustomerEntryInput, options?: Parameters<typeof customFetch>[1]): Promise<CustomerEntry> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CustomerEntry>(getUpdateCustomerEntryUrl(customerId,entryId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(customerEntryInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateCustomerEntryMutationKey = () => ['updateCustomerEntry'] as const;
+
+export const getUpdateCustomerEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomerEntry>>, TError,UpdateCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCustomerEntry>>, TError,UpdateCustomerEntryMutationVariables, TContext> => {
+
+const mutationKey = getUpdateCustomerEntryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCustomerEntry>>, UpdateCustomerEntryMutationVariables> = (props) => {
+          const {customerId,entryId,data} = props ?? {};
+
+          return  updateCustomerEntry(customerId,entryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCustomerEntryMutationResult = NonNullable<Awaited<ReturnType<typeof updateCustomerEntry>>>
+    export type UpdateCustomerEntryMutationBody = BodyType<CustomerEntryInput>
+    export type UpdateCustomerEntryMutationError = ErrorType<unknown>
+    export type UpdateCustomerEntryMutationVariables = {customerId: string;entryId: string;data: BodyType<CustomerEntryInput>}
+
+    export const useUpdateCustomerEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomerEntry>>, TError,UpdateCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateCustomerEntry>>,
+        TError,
+        UpdateCustomerEntryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateCustomerEntryMutationOptions(options), queryClient);
+    }
+
+export const getDeleteCustomerEntryUrl = (customerId: string,
+    entryId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries/${entryId}`
+}
+
+export const deleteCustomerEntry = async (customerId: string,
+    entryId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteCustomerEntryUrl(customerId,entryId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteCustomerEntryMutationKey = () => ['deleteCustomerEntry'] as const;
+
+export const getDeleteCustomerEntryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCustomerEntry>>, TError,DeleteCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteCustomerEntry>>, TError,DeleteCustomerEntryMutationVariables, TContext> => {
+
+const mutationKey = getDeleteCustomerEntryMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteCustomerEntry>>, DeleteCustomerEntryMutationVariables> = (props) => {
+          const {customerId,entryId} = props ?? {};
+
+          return  deleteCustomerEntry(customerId,entryId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteCustomerEntryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCustomerEntry>>>
+
+    export type DeleteCustomerEntryMutationError = ErrorType<unknown>
+    export type DeleteCustomerEntryMutationVariables = {customerId: string;entryId: string}
+
+    export const useDeleteCustomerEntry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCustomerEntry>>, TError,DeleteCustomerEntryMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteCustomerEntry>>,
+        TError,
+        DeleteCustomerEntryMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteCustomerEntryMutationOptions(options), queryClient);
+    }
+
+export const getRequestCustomerAttachmentUploadUrl = (customerId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/attachment-uploads`
+}
+
+export const requestCustomerAttachmentUpload = async (customerId: string,
+    customerAttachmentUploadInput: CustomerAttachmentUploadInput, options?: Parameters<typeof customFetch>[1]): Promise<CustomerAttachmentUpload> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CustomerAttachmentUpload>(getRequestCustomerAttachmentUploadUrl(customerId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(customerAttachmentUploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestCustomerAttachmentUploadMutationKey = () => ['requestCustomerAttachmentUpload'] as const;
+
+export const getRequestCustomerAttachmentUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>, TError,RequestCustomerAttachmentUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>, TError,RequestCustomerAttachmentUploadMutationVariables, TContext> => {
+
+const mutationKey = getRequestCustomerAttachmentUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>, RequestCustomerAttachmentUploadMutationVariables> = (props) => {
+          const {customerId,data} = props ?? {};
+
+          return  requestCustomerAttachmentUpload(customerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestCustomerAttachmentUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>>
+    export type RequestCustomerAttachmentUploadMutationBody = BodyType<CustomerAttachmentUploadInput>
+    export type RequestCustomerAttachmentUploadMutationError = ErrorType<unknown>
+    export type RequestCustomerAttachmentUploadMutationVariables = {customerId: string;data: BodyType<CustomerAttachmentUploadInput>}
+
+    export const useRequestCustomerAttachmentUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>, TError,RequestCustomerAttachmentUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestCustomerAttachmentUpload>>,
+        TError,
+        RequestCustomerAttachmentUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestCustomerAttachmentUploadMutationOptions(options), queryClient);
+    }
+
+export const getGetCustomerEntryFileUrl = (customerId: string,
+    entryId: string,
+    fileId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries/${entryId}/files/${fileId}`
+}
+
+export const getCustomerEntryFile = async (customerId: string,
+    entryId: string,
+    fileId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob | void> => {
+
+  return customFetch<Blob | void>(getGetCustomerEntryFileUrl(customerId,entryId,fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCustomerEntryFileQueryKey = (customerId: string,
+    entryId: string,
+    fileId: string,) => {
+    return [
+    `/api/customers/${customerId}/entries/${entryId}/files/${fileId}`
+    ] as const;
+    }
+
+
+export const getGetCustomerEntryFileQueryOptions = <TData = Awaited<ReturnType<typeof getCustomerEntryFile>>, TError = ErrorType<unknown>>(customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCustomerEntryFileQueryKey(customerId,entryId,fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCustomerEntryFile>>> = ({ signal }) => getCustomerEntryFile(customerId,entryId,fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: customerId !== null && customerId !== undefined && entryId !== null && entryId !== undefined && fileId !== null && fileId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCustomerEntryFileQueryResult = NonNullable<Awaited<ReturnType<typeof getCustomerEntryFile>>>
+export type GetCustomerEntryFileQueryError = ErrorType<unknown>
+
+
+export function useGetCustomerEntryFile<TData = Awaited<ReturnType<typeof getCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCustomerEntryFile>>,
+          TError,
+          Awaited<ReturnType<typeof getCustomerEntryFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCustomerEntryFile<TData = Awaited<ReturnType<typeof getCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCustomerEntryFile>>,
+          TError,
+          Awaited<ReturnType<typeof getCustomerEntryFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCustomerEntryFile<TData = Awaited<ReturnType<typeof getCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCustomerEntryFile<TData = Awaited<ReturnType<typeof getCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCustomerEntryFileQueryOptions(customerId,entryId,fileId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDownloadCustomerEntryFileUrl = (customerId: string,
+    entryId: string,
+    fileId: string,) => {
+
+
+
+
+  return `/api/customers/${customerId}/entries/${entryId}/files/${fileId}/download`
+}
+
+export const downloadCustomerEntryFile = async (customerId: string,
+    entryId: string,
+    fileId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadCustomerEntryFileUrl(customerId,entryId,fileId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadCustomerEntryFileQueryKey = (customerId: string,
+    entryId: string,
+    fileId: string,) => {
+    return [
+    `/api/customers/${customerId}/entries/${entryId}/files/${fileId}/download`
+    ] as const;
+    }
+
+
+export const getDownloadCustomerEntryFileQueryOptions = <TData = Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError = ErrorType<unknown>>(customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadCustomerEntryFileQueryKey(customerId,entryId,fileId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadCustomerEntryFile>>> = ({ signal }) => downloadCustomerEntryFile(customerId,entryId,fileId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: customerId !== null && customerId !== undefined && entryId !== null && entryId !== undefined && fileId !== null && fileId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadCustomerEntryFileQueryResult = NonNullable<Awaited<ReturnType<typeof downloadCustomerEntryFile>>>
+export type DownloadCustomerEntryFileQueryError = ErrorType<unknown>
+
+
+export function useDownloadCustomerEntryFile<TData = Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadCustomerEntryFile>>,
+          TError,
+          Awaited<ReturnType<typeof downloadCustomerEntryFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadCustomerEntryFile<TData = Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadCustomerEntryFile>>,
+          TError,
+          Awaited<ReturnType<typeof downloadCustomerEntryFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadCustomerEntryFile<TData = Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDownloadCustomerEntryFile<TData = Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError = ErrorType<unknown>>(
+ customerId: string,
+    entryId: string,
+    fileId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadCustomerEntryFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadCustomerEntryFileQueryOptions(customerId,entryId,fileId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetCurrentAuthUserUrl = () => {
 
