@@ -62,7 +62,7 @@ export function AgendaFilterBar({ f, set, options, customers, matchCount }: {
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Buscar</div>
           <label className="relative block">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input aria-label="Buscar compromissos" value={f.q} onChange={(e) => set({ q: e.target.value })} placeholder="Título, pessoa, cliente..." className="field agenda-filter-search h-10" data-testid="filter-search" />
+            <input aria-label="Buscar compromissos" value={f.q} onChange={(e) => set({ q: e.target.value })} placeholder="Título, pessoa, cliente..." className="field has-leading-icon h-10" data-testid="filter-search" />
           </label>
         </div>
         <div className="space-y-2 border-t pt-3">

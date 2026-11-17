@@ -237,7 +237,7 @@ export function SearchBox({ value, onChange, placeholder = "Buscar..." }: { valu
   return (
     <div className="relative w-full sm:w-64">
       <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="field pl-8" data-testid="input-search" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="field has-leading-icon" data-testid="input-search" />
     </div>
   );
 }
