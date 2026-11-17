@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Users2,
   Contact,
-  FolderKanban,
   Landmark,
   CalendarRange,
   Bot,
@@ -37,8 +36,7 @@ const NAV: Item[] = [
     label: "Clientes",
     href: "/clientes",
     icon: Contact,
-    match: (p) => p === "/clientes",
-    children: [{ label: "Projetos", href: "/clientes/projetos", icon: FolderKanban, match: (p) => p.startsWith("/clientes/projetos") }],
+    match: (p) => p === "/clientes" || p.startsWith("/clientes/"),
   },
   {
     label: "Financeiro",
